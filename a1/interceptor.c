@@ -644,6 +644,7 @@ static void exit_function(void){
 
 	// Unlock the spin lock
 	spin_unlock(&sys_call_table_lock);
+	return 0;
 }
 
 module_init(init_function);
