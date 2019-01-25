@@ -291,20 +291,9 @@ asmlinkage long interceptor(struct pt_regs reg) {
 		return 1;
 	}
 
-	// Unlock access to mytable
-	spin_unlock(&my_table_lock);
-
-	// lock my_table
-	spin_lock(&sys_call_table_lock);
 
 	// if syscall.monitored == 2 then check if the pid is not in the pid list
-	if (sys_call_table[reg.ax].monitored == 2) {
-
-		// unlock my_table
-		spin_unlock(&sys_call_table_lock);
-
-		// lock my_table
-		spin_lock(&my_table_lock);
+	if (table[reg.ax].monitored == 2) {
 
 		if (check_pid_monitored(reg.ax, current->pid) == 0)
 		{
@@ -318,13 +307,7 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 
 	// else if monitored    == 1 then check if the pid is in the pid list
-	} else if (sys_call_table[reg.ax].monitored == 1) {
-
-		// unlock my_table
-		spin_unlock(&sys_call_table_lock);
-
-		// lock my_table
-		spin_lock(&my_table_lock);
+	} else if (table[reg.ax].monitored == 1) {
 
 		if (check_pid_monitored(reg.ax, current->pid) == 1)
 		{
