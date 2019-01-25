@@ -345,11 +345,6 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		return -EINVAL;
 	}
 
-	// pid cannot be a negative integer and it must be an existing pid.
-	if (pid < 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
-		return -EINVAL;
-	}
-
 	// For the first two commands, we must be root.
 	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE) 
 	{
@@ -367,6 +362,12 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 			if (pid == 0) { return -EINVAL; }
 
 		}
+
+		// pid cannot be a negative integer and it must be an existing pid.
+		if (pid < 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
+			return -EINVAL;
+		}
+
 	}
 
 	spin_lock(&my_table_lock);
