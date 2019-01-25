@@ -415,31 +415,32 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 		// Lock access to my table
 		spin_unlock(&my_table_lock);
+
+	} else if (cmd == REQUEST_SYSCALL_RELEASE) {
+		
+		// printk("Release prob");
+		// Lock mytable.
+		spin_lock(&my_table_lock);
+
+		// Set up "mytable" for a syscall.
+		table[syscall].intercepted	= 0;
+
+		// destroys pid list and sets listCount and monitored to 0.
+		destroy_list(syscall);
+
+		// Lock access to kernel system call table.
+		spin_lock(&sys_call_table_lock);
+
+		// Update the sys_call_table.
+		set_addr_rw((unsigned long)sys_call_table);
+		sys_call_table[syscall] = table[syscall].f;
+		set_addr_ro((unsigned long)sys_call_table);
+
+		// Unlock the syslock table.
+		spin_unlock(&sys_call_table_lock);
+		// Unlock  mytable.
+		spin_unlock(&my_table_lock);
 	}
-
-	// else if (cmd == REQUEST_SYSCALL_RELEASE) {
-	// 	printk("Release prob");
-	// 	// Lock mytable.
-	// 	spin_lock(&my_table_lock);
-
-	// 	// Set up "mytable" for a syscall.
-	// 	table[syscall].intercepted	= 0;
-
-	// 	// destroys pid list and sets listCount and monitored to 0.
-	// 	destroy_list(syscall);
-
-	// 	// Lock access to kernel system call table.
-	// 	spin_lock(&sys_call_table_lock);
-
-	// 	// Update the sys_call_table.
-	// 	set_addr_rw((unsigned long)sys_call_table);
-	// 	sys_call_table[syscall] = table[syscall].f;
-	// 	set_addr_ro((unsigned long)sys_call_table);
-
-	// 	// Unlock the syslock table.
-	// 	spin_unlock(&sys_call_table_lock);
-	// 	// Unlock  mytable.
-	// 	spin_unlock(&my_table_lock);
 	
 	// } else if (cmd == REQUEST_START_MONITORING)	{
 
