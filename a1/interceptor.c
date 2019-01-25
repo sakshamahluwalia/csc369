@@ -283,9 +283,6 @@ asmlinkage long my_exit_group(struct pt_regs reg)
  */
 asmlinkage long interceptor(struct pt_regs reg) {
 
-	// lock my_table
-	spin_lock(&my_table_lock);
-
 	// Check if the syscall is being monitored for the current->pid
 	if (check_pid_monitored(reg.ax, current->pid) == 0){
 		return 1;
@@ -296,9 +293,6 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 		if (check_pid_monitored(reg.ax, current->pid) == 0)
 		{
-
-			// Unlock access to mytable
-			spin_unlock(&my_table_lock);
 			// Log the message
 			log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
 
@@ -310,9 +304,6 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 		if (check_pid_monitored(reg.ax, current->pid) == 1)
 		{
-
-			// Unlock access to mytable
-			spin_unlock(&my_table_lock);
 			// Log the message
 			log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
 
@@ -320,9 +311,6 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 
 	}
-
-	// unlock my_table
-	spin_unlock(&sys_call_table_lock);
 
 	// Call the original system call
 	return (*(table[reg.ax].f))(reg);
@@ -467,16 +455,16 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		// Lock access to kernel system call table.
 		spin_lock(&sys_call_table_lock);
 
-		// Lock mytable.
-		spin_lock(&my_table_lock);
+		// // Lock mytable.
+		// spin_lock(&my_table_lock);
 
 		// Update the sys_call_table.
 		set_addr_rw((unsigned long)sys_call_table);
 		sys_call_table[syscall] = table[syscall].f;
 		set_addr_ro((unsigned long)sys_call_table);
 
-		// Unlock  mytable.
-		spin_unlock(&my_table_lock);
+		// // Unlock  mytable.
+		// spin_unlock(&my_table_lock);
 
 		// Unlock the syslock table.
 		spin_unlock(&sys_call_table_lock);
@@ -709,7 +697,6 @@ static void exit_function(void){
 
 	// unlock sys_call_table
 	spin_unlock(&sys_call_table_lock);
-
 }
 
 module_init(init_function);
