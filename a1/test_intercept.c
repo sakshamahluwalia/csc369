@@ -29,7 +29,7 @@ int vsyscall_arg(int sno, int n, ...) {
 	va_end(va);
 	
 	ret = syscall(sno, args[0], args[1], args[2]);
-	printf(" %d is ret\n");
+	printf(" %d is ret\n", ret);
 	if(ret) ret = -errno;
 	return ret;
 }
@@ -137,6 +137,7 @@ int main(int argc, char **argv) {
 	   once you get everything to work; check Linux documentation
 	   for other syscall number definitions.  */
 
+	printf("Last test after this\n");
 	test("rmmod interceptor.ko %s", "", system("rmmod interceptor") == 0);
 	return 0;
 }
