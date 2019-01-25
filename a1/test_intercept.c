@@ -138,9 +138,10 @@ int main(int argc, char **argv) {
 
 	printf("SYS open test\n");
 	test_syscall(SYS_open);
-	printf("\n NEW CUSTOM SYSACLL START\n");
-	test_syscall(SYS_open);
-	printf("\n NEW CUSTOM SYSACLL END\n");
+	
+	// printf("\n NEW CUSTOM SYSACLL START\n");
+	// test_syscall(SYS_open);
+	// printf("\n NEW CUSTOM SYSACLL END\n");
 
 	/* The above line of code tests SYS_open.
 	   Feel free to add more tests here for other system calls, 
