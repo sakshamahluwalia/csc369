@@ -316,29 +316,8 @@ asmlinkage long interceptor(struct pt_regs reg) {
  *      For the last two, if pid=0, that translates to "all pids".
  * 
  * TODO: Implement this function, to handle all 4 commands correctly.
- *
- * - For each of the commands, check that the arguments are valid (-EINVAL):
- *   a) the syscall must be valid (not negative, not > NR_syscalls-1, and not MY_CUSTOM_SYSCALL itself)
- *   b) the pid must be valid for the last two commands. It cannot be a negative integer, 
- *      and it must be an existing pid (except for the case when it's 0, indicating that we want 
- *      to start/stop monitoring for "all pids"). 
- *      If a pid belongs to a valid process, then the following expression is non-NULL:
- *           pid_task(find_vpid(pid), PIDTYPE_PID)
- * - Check that the caller has the right permissions (-EPERM)
- *      For the first two commands, we must be root (see the current_uid() macro).
- *      For the last two commands, the following logic applies:
- *        - is the calling process root? if so, all is good, no doubts about permissions.
- *        - if not, then check if the 'pid' requested is owned by the calling process 
- *        - also, if 'pid' is 0 and the calling process is not root, then access is denied 
- *          (monitoring all pids is allowed only for root, obviously).
- *      To determine if two pids have the same owner, use the helper function provided above in this file.
  * - Check for correct context of commands (-EINVAL):
- *     a) Cannot de-intercept a system call that has not been intercepted yet.
- *     b) Cannot stop monitoring for a pid that is not being monitored, or if the 
- *        system call has not been intercepted yet.
  * - Check for -EBUSY conditions:
- *     a) If intercepting a system call that is already intercepted.
- *     b) If monitoring a pid that is already being monitored.
  * - If a pid cannot be added to a monitored list, due to no memory being available,
  *   an -ENOMEM error code should be returned.
  *
@@ -360,11 +339,61 @@ asmlinkage long interceptor(struct pt_regs reg) {
  */
 asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
-	// ERROR CHECKING
-	
+	// the syscall must not be negative, not > NR_syscalls-1, and not MY_CUSTOM_SYSCALL
+	if (0 > syscall && syscall > NR_syscalls-1 || syscall == MY_CUSTOM_SYSCALL)
+	{
+		return -EINVAL;
+	}
 
+	// pid cannot be a negative integer and it must be an existing pid.
+	if (pid < 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
+		return -EINVAL;
+	}
 
-	// spin_unlock(&my_table_lock);
+	// For the first two commands, we must be root.
+	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE) 
+	{
+		if (current_uid() != 0) { return -EPERM; }
+	}
+
+	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING) 
+	{	
+		// calling process is not root
+		if (current_uid() != 0) {
+
+			// check if the 'pid' requested is owned by the calling process 
+			if (check_pids_same_owner(pid, current->pid) != 0) { return -EPERM;	}
+			// if 'pid' is 0 and calling process is not root, then access is denied
+			if (pid == 0) { return -EINVAL; }
+
+		}
+	}
+
+	spin_lock(&my_table_lock);
+
+	// Cannot de-intercept a system call that has not been intercepted yet.
+	if (cmd == REQUEST_SYSCALL_RELEASE && table[syscall].intercepted == 0)
+	{
+		return -EINVAL;
+	}
+
+	/* Cannot stop monitoring for a pid that is not being monitored, or if the 	  system call has not been intercepted yet.
+	*/
+	if (cmd == REQUEST_STOP_MONITORING)
+	{
+		if (table[syscall].intercepted == 0 || check_pid_monitored(syscall, pid) == 1) {	return -EINVAL;	}
+	}
+
+	// If intercepting a system call that is already intercepted.
+	if (cmd == REQUEST_SYSCALL_INTERCEPT && table[syscall].intercepted == 1)
+	{
+		return -EBUSY;
+	}
+
+	// If monitoring a pid that is already being monitored
+	if (cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid) == 1) { return -EBUSY;	}
+
+	spin_unlock(&my_table_lock);
 
 	// if (cmd == REQUEST_SYSCALL_INTERCEPT) {
 	// 	printk("Intercept prob");
