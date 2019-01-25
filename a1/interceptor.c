@@ -291,9 +291,8 @@ asmlinkage long interceptor(struct pt_regs reg) {
 		return 1;
 	}
 
-
 	// if syscall.monitored == 2 then check if the pid is not in the pid list
-	if (table[reg.ax].monitored == 2) {
+	if (_table[reg.ax].monitored == 2) {
 
 		if (check_pid_monitored(reg.ax, current->pid) == 0)
 		{
@@ -669,29 +668,16 @@ static int init_function(void) {
  */
 static void exit_function(void){
 	
-	// // Restore MY_CUSTOM_SYSCALL to original syscall
-	// sys_call_table[MY_CUSTOM_SYSCALL] = orig_custom_syscall;
-	// // Restore __NR_exit_group to original syscall
-	// sys_call_table[__NR_exit_group] = orig_exit_group;
-
 	// lock sys_call_table
 	spin_lock(&sys_call_table_lock);
 
 	// Set system call table to read write and restore original system call
 	set_addr_rw((unsigned long) sys_call_table);
-
-	// lock  mytable.
-	spin_lock(&my_table_lock);
-
-	// skipping 0 since it points to MY_CUSTOM_SYSCALL
-	int i;
-	for (i = 0; i < NR_syscalls; i++)
-	{	
-		sys_call_table[i] = table[i].f;
-		table[i].intercepted = 0;
-		destroy_list(i);
-
-	}
+	
+	// Restore MY_CUSTOM_SYSCALL to original syscall
+	sys_call_table[MY_CUSTOM_SYSCALL] = orig_custom_syscall;
+	// Restore __NR_exit_group to original syscall
+	sys_call_table[__NR_exit_group] = orig_exit_group;
 
 	// Set system call table to read only
 	set_addr_ro((unsigned long) sys_call_table);
@@ -699,8 +685,31 @@ static void exit_function(void){
 	// unlock sys_call_table
 	spin_unlock(&sys_call_table_lock);
 
+	// lock  mytable.
+	spin_lock(&my_table_lock);
+
+	// lock sys_call_table
+	spin_lock(&sys_call_table_lock);
+
+	// skipping 0 since it points to MY_CUSTOM_SYSCALL
+	int i;
+	for (i = 1; i < NR_syscalls; i++)
+	{	
+		if (i != __NR_exit_group)
+		{
+			sys_call_table[i] = table[i].f;
+		}
+		table[i].intercepted = 0;
+		destroy_list(i);
+
+	}
+
 	// Unlock  mytable.
 	spin_unlock(&my_table_lock);
+
+	// unlock sys_call_table
+	spin_unlock(&sys_call_table_lock);
+
 }
 
 module_init(init_function);
