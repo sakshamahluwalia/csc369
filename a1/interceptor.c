@@ -374,7 +374,8 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 	// Cannot de-intercept a system call that has not been intercepted yet.
 	if (cmd == REQUEST_SYSCALL_RELEASE && table[syscall].intercepted == 0)
-	{
+	{	
+		spin_unlock(&my_table_lock);
 		return -EINVAL;
 	}
 
@@ -382,19 +383,27 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	*/
 	if (cmd == REQUEST_STOP_MONITORING)
 	{
-		if (table[syscall].intercepted == 0 || check_pid_monitored(syscall, pid) == 1) {	return -EINVAL;	}
+		if (table[syscall].intercepted == 0 || check_pid_monitored(syscall, pid) == 1) {	
+			spin_unlock(&my_table_lock);
+			return -EINVAL;
+		}
 	}
 
 	// If intercepting a system call that is already intercepted.
 	if (cmd == REQUEST_SYSCALL_INTERCEPT && table[syscall].intercepted == 1)
-	{
+	{	
+		spin_unlock(&my_table_lock);
 		return -EBUSY;
 	}
 
 	// If monitoring a pid that is already being monitored
-	if (cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid) == 1) { return -EBUSY;	}
+	if (cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid) == 1) { 
+		spin_unlock(&my_table_lock);
+		return -EBUSY;
+	}
 
 	spin_unlock(&my_table_lock);
+	
 
 	if (cmd == REQUEST_SYSCALL_INTERCEPT) {
 		
@@ -410,6 +419,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		spin_unlock(&sys_call_table_lock);
 
 		spin_lock(&my_table_lock);
+
 		table[syscall].intercepted = 1;
 		// Lock access to my table
 		spin_unlock(&my_table_lock);
@@ -427,18 +437,25 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		// destroys pid list and sets listCount and monitored to 0.
 		destroy_list(syscall);
 
+		// Unlock  mytable.
+		spin_unlock(&my_table_lock);
+
 		// Lock access to kernel system call table.
 		spin_lock(&sys_call_table_lock);
+
+		// Lock mytable.
+		spin_lock(&my_table_lock);
 
 		// Update the sys_call_table.
 		set_addr_rw((unsigned long)sys_call_table);
 		sys_call_table[syscall] = table[syscall].f;
 		set_addr_ro((unsigned long)sys_call_table);
 
-		// Unlock the syslock table.
-		spin_unlock(&sys_call_table_lock);
 		// Unlock  mytable.
 		spin_unlock(&my_table_lock);
+
+		// Unlock the syslock table.
+		spin_unlock(&sys_call_table_lock);
 	}
 	
 	// } else if (cmd == REQUEST_START_MONITORING)	{
@@ -553,14 +570,15 @@ long (*orig_custom_syscall)(void);
  * - Ensure synchronization as needed.
  */
 static int init_function(void) {
-	 // Lock access to kernel system call table
-	spin_lock(&sys_call_table_lock);
 
 	// Save original system call
 	orig_custom_syscall = sys_call_table[MY_CUSTOM_SYSCALL];
 
 	// Save original exit group
 	orig_exit_group = sys_call_table[__NR_exit_group];
+
+	 // Lock access to kernel system call table
+	spin_lock(&sys_call_table_lock);
 
 	// Hijack MY_CUSTOM_SYSCALL
 
@@ -574,6 +592,9 @@ static int init_function(void) {
 
 	// Set kernel system call table to read only and unlock access to kernel system call table
 	set_addr_ro((unsigned long) sys_call_table);
+
+	// unlock sys_call_table
+	spin_unlock(&sys_call_table_lock);
 
 	// Lock mytable.
 	spin_lock(&my_table_lock);
@@ -594,8 +615,7 @@ static int init_function(void) {
 
 	// Unlock  mytable.
 	spin_unlock(&my_table_lock);
-	
-	spin_unlock(&sys_call_table_lock);
+
 	return 0;
 }
 
@@ -622,6 +642,12 @@ static void exit_function(void){
 	// Restore __NR_exit_group to original syscall
 	sys_call_table[__NR_exit_group] = orig_exit_group;
 
+	// Set system call table to read only
+	set_addr_ro((unsigned long) sys_call_table);
+
+	// unlock sys_call_table
+	spin_unlock(&sys_call_table_lock);
+
 	// lock  mytable.
 	spin_lock(&my_table_lock);
 
@@ -642,16 +668,10 @@ static void exit_function(void){
 		table[i].intercepted = 0;
 		destroy_list(i);
 
-	}
-
-	// Set system call table to read only
-	set_addr_ro((unsigned long) sys_call_table);	
+	}	
 
 	// Unlock  mytable.
 	spin_unlock(&my_table_lock);
-
-	// Unlock the spin lock
-	spin_unlock(&sys_call_table_lock);
 }
 
 module_init(init_function);

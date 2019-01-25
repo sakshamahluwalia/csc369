@@ -104,8 +104,8 @@ void test_syscall(int syscall) {
 	do_intercept(syscall, 0);
 	printf("works2\n");
 	do_intercept(syscall, -EBUSY);
-	// printf("works3\n");
-	// do_as_guest("./test_intercept nonroot %d", syscall, 0); // error about shared files
+	printf("works3\n");
+	do_as_guest("./test_intercept nonroot %d", syscall, 0); // error about shared files
 	printf("works4\n");
 	do_release(syscall, 0); // this line gets stuck
 	printf("end\n");
