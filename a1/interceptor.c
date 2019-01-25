@@ -655,8 +655,11 @@ static void exit_function(void){
 	// skipping 0 since it points to MY_CUSTOM_SYSCALL
 	int i;
 	for (i = 1; i < NR_syscalls; i++)
-	{			
-		sys_call_table[i] = table[i].f;
+	{	
+		if (i != __NR_exit_group)
+		{
+			sys_call_table[i] = table[i].f;
+		}
 		table[i].intercepted = 0;
 		destroy_list(i);
 
