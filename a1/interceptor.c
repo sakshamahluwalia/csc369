@@ -557,10 +557,10 @@ static int init_function(void) {
 	spin_lock(&sys_call_table_lock);
 
 	// Save original system call
-	*orig_custom_syscall = sys_call_table[MY_CUSTOM_SYSCALL];
+	orig_custom_syscall = sys_call_table[MY_CUSTOM_SYSCALL];
 
 	// Save original exit group
-	*orig_exit_group = sys_call_table[__NR_exit_group];
+	orig_exit_group = sys_call_table[__NR_exit_group];
 
 	// Hijack MY_CUSTOM_SYSCALL
 
@@ -627,11 +627,13 @@ static void exit_function(void){
 
 	// skipping 0 since it points to MY_CUSTOM_SYSCALL
 	int i;
-	for (i = 0; i < NR_syscalls; i++)
+	for (i = 1; i < NR_syscalls; i++)
 	{			
 		// Set up "mytable" for a syscall.
-		sys_call_table[i]		= table[i].f;
-		destroy_list(i);
+		if (i != __NR_exit_group)  {
+			sys_call_table[i]		= table[i].f;
+			destroy_list(i);
+		}
 
 	}
 
