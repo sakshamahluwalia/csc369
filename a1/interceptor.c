@@ -627,22 +627,20 @@ static void exit_function(void){
 
 	// skipping 0 since it points to MY_CUSTOM_SYSCALL
 	int i;
+	for (i = 1; i < NR_syscalls; i++)
+	{			
+		// Set up "mytable" for a syscall.
+		if (i != __NR_exit_group)  {
+			sys_call_table[i] = table[i].f;
+		}
+
+	}
+
 	for (i = 0; i < NR_syscalls; i++)
 	{			
 
 		table[i].intercepted = 0;
 		destroy_list(i);
-
-	}
-
-
-	for (i = 1; i < NR_syscalls; i++)
-	{			
-		// Set up "mytable" for a syscall.
-		if (i != __NR_exit_group)  {
-			sys_call_table[i]		= table[i].f;
-			destroy_list(i);
-		}
 
 	}
 
