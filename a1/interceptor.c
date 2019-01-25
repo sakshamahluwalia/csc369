@@ -292,7 +292,7 @@ asmlinkage long interceptor(struct pt_regs reg) {
 	}
 
 	// if syscall.monitored == 2 then check if the pid is not in the pid list
-	if (_table[reg.ax].monitored == 2) {
+	if (table[reg.ax].monitored == 2) {
 
 		if (check_pid_monitored(reg.ax, current->pid) == 0)
 		{
