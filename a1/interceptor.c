@@ -576,8 +576,6 @@ static int init_function(void) {
 	// Lock access to kernel system call table
 	spin_lock(&sys_call_table_lock);
 
-	// Hijack MY_CUSTOM_SYSCALL
-
 	// Save original system call
 	orig_custom_syscall = sys_call_table[MY_CUSTOM_SYSCALL];
 
@@ -589,7 +587,8 @@ static int init_function(void) {
 
 	// Hijack __NR_exit_group and replace with my_exit_group
 	sys_call_table[__NR_exit_group] = my_exit_group;
-	
+		
+	// Hijack MY_CUSTOM_SYSCALL
 	sys_call_table[MY_CUSTOM_SYSCALL] = my_syscall;
 
 	// Set kernel system call table to read only and unlock access to kernel system call table
@@ -657,20 +656,11 @@ static void exit_function(void){
 	int i;
 	for (i = 1; i < NR_syscalls; i++)
 	{			
-		// Set up "mytable" for a syscall.
-		if (i != __NR_exit_group)  {
-			sys_call_table[i] = table[i].f;
-		}
-
-	}
-
-	for (i = 0; i < NR_syscalls; i++)
-	{			
-
+		sys_call_table[i] = table[i].f;
 		table[i].intercepted = 0;
 		destroy_list(i);
 
-	}	
+	}
 
 	// Unlock  mytable.
 	spin_unlock(&my_table_lock);
