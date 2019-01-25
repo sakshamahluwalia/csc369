@@ -557,10 +557,10 @@ static int init_function(void) {
 	spin_lock(&sys_call_table_lock);
 
 	// Save original system call
-	orig_custom_syscall = sys_call_table[MY_CUSTOM_SYSCALL];
+	*orig_custom_syscall = sys_call_table[MY_CUSTOM_SYSCALL];
 
 	// Save original exit group
-	orig_exit_group = sys_call_table[__NR_exit_group];
+	*orig_exit_group = sys_call_table[__NR_exit_group];
 
 	// Hijack MY_CUSTOM_SYSCALL
 
