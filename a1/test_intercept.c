@@ -107,7 +107,7 @@ void test_syscall(int syscall) {
 	printf("works3\n");
 	do_as_guest("./test_intercept nonroot %d", syscall, 0);
 	printf("works4\n");
-	// do_release(syscall, 0);
+	do_release(syscall, 0);
 	printf("end\n");
 }
 
