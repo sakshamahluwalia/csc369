@@ -578,7 +578,7 @@ static int init_function(void) {
 
 	// skipping 0 since it points to MY_CUSTOM_SYSCALL
 	int i;
-	for (i = 1; i < NR_syscalls; i++)
+	for (i = 0; i < NR_syscalls; i++)
 	{
 		
 		// Set up "mytable" for a syscall.
@@ -608,44 +608,39 @@ static int init_function(void) {
  * - Ensure synchronization, if needed.
  */
 static void exit_function(void){
-	/*
-	// Keep busy until lock is busy and lock after
+	
+	// lock sys_call_table
 	spin_lock(&sys_call_table_lock);
 
 	// Set system call table to read write and restore original system call
 	set_addr_rw((unsigned long) sys_call_table);
 	
+	// Restore MY_CUSTOM_SYSCALL to original syscall
 	sys_call_table[MY_CUSTOM_SYSCALL] = orig_custom_syscall;
-
 	// Restore __NR_exit_group to original syscall
 	sys_call_table[__NR_exit_group] = orig_exit_group;
 
-	// Unlock  mytable.
+	// lock  mytable.
 	spin_lock(&my_table_lock);
 
 	// skipping 0 since it points to MY_CUSTOM_SYSCALL
 	int i;
-	for (i = 1; i < NR_syscalls; i++)
-	{
-		
-		if (i != __NR_exit_group)
-		{
-			
-			// Set up "mytable" for a syscall.
-			sys_call_table[i]		= table[i].f;
-			destroy_list(i);
-		}
+	for (i = 0; i < NR_syscalls; i++)
+	{			
+		// Set up "mytable" for a syscall.
+		sys_call_table[i]		= table[i].f;
+		destroy_list(i);
 
 	}
+
+	// Set system call table to read only
+	set_addr_ro((unsigned long) sys_call_table);	
 
 	// Unlock  mytable.
 	spin_unlock(&my_table_lock);
 
-	// Set system call table to read only
-	set_addr_ro((unsigned long) sys_call_table);
-
 	// Unlock the spin lock
-	spin_unlock(&sys_call_table_lock);*/
+	spin_unlock(&sys_call_table_lock);
 }
 
 module_init(init_function);
