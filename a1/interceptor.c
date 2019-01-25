@@ -399,22 +399,21 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	if (cmd == REQUEST_SYSCALL_INTERCEPT) {
 		
 		// printk("Intercept prob");
+
 		// Lock access to kernel system call table.
 		spin_lock(&sys_call_table_lock);
-		spin_lock(&my_table_lock);
-
 		// Update the sys_call_table.
 		set_addr_rw((unsigned long) sys_call_table);
-		table[syscall].f = sys_call_table[syscall];
 		sys_call_table[syscall] = interceptor;
-		table[syscall].intercepted = 1;
 		set_addr_ro((unsigned long) sys_call_table);
-
 		// Unlock the syslock table.
 		spin_unlock(&sys_call_table_lock);
 
+		spin_lock(&my_table_lock);
+		table[syscall].intercepted = 1;
 		// Lock access to my table
 		spin_unlock(&my_table_lock);
+
 
 	} else if (cmd == REQUEST_SYSCALL_RELEASE) {
 		
@@ -424,7 +423,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 		// Set up "mytable" for a syscall.
 		table[syscall].intercepted	= 0;
-
+		
 		// destroys pid list and sets listCount and monitored to 0.
 		destroy_list(syscall);
 
