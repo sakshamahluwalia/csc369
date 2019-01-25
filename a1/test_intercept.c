@@ -100,10 +100,15 @@ int do_nonroot(int syscall) {
 
 void test_syscall(int syscall) {
 	//clear_log();
+	printf("works1\n");
 	do_intercept(syscall, 0);
+	printf("works2\n");
 	do_intercept(syscall, -EBUSY);
+	printf("works3\n");
 	do_as_guest("./test_intercept nonroot %d", syscall, 0);
+	printf("works4\n");
 	do_release(syscall, 0);
+	printf("end\n");
 }
 
 
