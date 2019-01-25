@@ -418,10 +418,12 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		// Unlock the syslock table.
 		spin_unlock(&sys_call_table_lock);
 
+		// lock access to my table
 		spin_lock(&my_table_lock);
 
 		table[syscall].intercepted = 1;
-		// Lock access to my table
+		
+		// unlock access to my table
 		spin_unlock(&my_table_lock);
 
 
