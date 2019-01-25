@@ -137,6 +137,7 @@ int main(int argc, char **argv) {
 	   once you get everything to work; check Linux documentation
 	   for other syscall number definitions.  */
 
+	printf("Last test after this\n");
 	test("rmmod interceptor.ko %s", "", system("rmmod interceptor") == 0);
 	return 0;
 }
