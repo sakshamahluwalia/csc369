@@ -253,13 +253,13 @@ asmlinkage long (*orig_exit_group)(struct pt_regs reg);
  */
 asmlinkage long my_exit_group(struct pt_regs reg)
 {
-	// // delete the exiting process's pid from *all* syscall lists.
-	// del_pid(current->pid);
+	// delete the exiting process's pid from *all* syscall lists.
+	del_pid(current->pid);
 
-	// // Calling the orig_exit_group function.
-	// return (*orig_exit_group)(reg);
+	// Calling the orig_exit_group function.
+	return (*orig_exit_group)(reg);
 
-	return 0;
+	// return 0;
 }
 //----------------------------------------------------------------
 
