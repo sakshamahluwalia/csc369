@@ -253,11 +253,13 @@ asmlinkage long (*orig_exit_group)(struct pt_regs reg);
  */
 asmlinkage long my_exit_group(struct pt_regs reg)
 {
-	// delete the exiting process's pid from *all* syscall lists.
-	del_pid(current->pid);
+	// // delete the exiting process's pid from *all* syscall lists.
+	// del_pid(current->pid);
 
-	// Calling the orig_exit_group function.
-	return (*orig_exit_group)(reg);
+	// // Calling the orig_exit_group function.
+	// return (*orig_exit_group)(reg);
+
+	return 0;
 }
 //----------------------------------------------------------------
 
@@ -280,27 +282,28 @@ asmlinkage long my_exit_group(struct pt_regs reg)
  * - Don't forget to call the original system call, so we allow processes to proceed as normal.
  */
 asmlinkage long interceptor(struct pt_regs reg) {
-	// Keep busy until lock is available then lock access to mytable
-	spin_lock(&my_table_lock);
+	// // Keep busy until lock is available then lock access to mytable
+	// spin_lock(&my_table_lock);
 
-	// Check if the syscall is being monitored for the current->pid
-	if (check_pid_monitored(reg.ax, current->pid) == 0){
-		return 1;
-	}
+	// // Check if the syscall is being monitored for the current->pid
+	// if (check_pid_monitored(reg.ax, current->pid) == 0){
+	// 	return 1;
+	// }
 
-	// if syscall.monitored == 2 then check if the pid is not in the pid list
-	// else if monitored    == 1 then check if the pid is     in the pid list
+	// // if syscall.monitored == 2 then check if the pid is not in the pid list
+	// // else if monitored    == 1 then check if the pid is     in the pid list
 
-	// Log the message
-	log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
+	// // Log the message
+	// log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
 
-	// Call the original system call
-	int ret_value = (*(table[reg.ax].f))(reg);
+	// // Call the original system call
+	// int ret_value = (*(table[reg.ax].f))(reg);
 
-	// Unlock access to mytable
-	spin_unlock(&my_table_lock);
+	// // Unlock access to mytable
+	// spin_unlock(&my_table_lock);
 
-	return ret_value;
+	// return ret_value;
+	return 0;
 }
 
 /**
@@ -356,174 +359,174 @@ asmlinkage long interceptor(struct pt_regs reg) {
  *   you might be holding, before you exit the function (including error cases!).  
  */
 asmlinkage long my_syscall(int cmd, int syscall, int pid) {
-	/* Checks if commands are valid. */
-	if ((cmd != REQUEST_SYSCALL_INTERCEPT && cmd != REQUEST_SYSCALL_RELEASE && cmd != REQUEST_START_MONITORING && cmd != REQUEST_STOP_MONITORING) ||
-	 (syscall < 0 || syscall > NR_syscalls-1 || syscall != MY_CUSTOM_SYSCALL || pid < 0 || pid_task(find_vpid(pid), PIDTYPE_PID) == NULL)){
-		return -EINVAL;
-	}
+	// /* Checks if commands are valid. */
+	// if ((cmd != REQUEST_SYSCALL_INTERCEPT && cmd != REQUEST_SYSCALL_RELEASE && cmd != REQUEST_START_MONITORING && cmd != REQUEST_STOP_MONITORING) ||
+	//  (syscall < 0 || syscall > NR_syscalls-1 || syscall != MY_CUSTOM_SYSCALL || pid < 0 || pid_task(find_vpid(pid), PIDTYPE_PID) == NULL)){
+	// 	return -EINVAL;
+	// }
 
-	//struct task_struct *p1 = pid_task(find_vpid(pid), PIDTYPE_PID);
+	// //struct task_struct *p1 = pid_task(find_vpid(pid), PIDTYPE_PID);
 
-	/* Check permissions. */
-	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE){
-		if (current_uid() != 0){
-			return -EPERM;
-		}
-	} else if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING){
-		if (current_uid() != 0){
-			if (pid == 0){
-				return -EPERM;
-			} else {
-				return check_pids_same_owner(current->pid, pid);
-			}
-		}
-	}
+	// /* Check permissions. */
+	// if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE){
+	// 	if (current_uid() != 0){
+	// 		return -EPERM;
+	// 	}
+	// } else if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING){
+	// 	if (current_uid() != 0){
+	// 		if (pid == 0){
+	// 			return -EPERM;
+	// 		} else {
+	// 			return check_pids_same_owner(current->pid, pid);
+	// 		}
+	// 	}
+	// }
 
-	spin_lock(&my_table_lock);
-	if ((cmd == REQUEST_SYSCALL_RELEASE && table[syscall].intercepted == 0) || (cmd == REQUEST_STOP_MONITORING && (check_pid_monitored(syscall, pid) == 0 || table[syscall].intercepted == 0))){
-		spin_unlock(&my_table_lock);
-		return -EINVAL;
-	}
+	// spin_lock(&my_table_lock);
+	// if ((cmd == REQUEST_SYSCALL_RELEASE && table[syscall].intercepted == 0) || (cmd == REQUEST_STOP_MONITORING && (check_pid_monitored(syscall, pid) == 0 || table[syscall].intercepted == 0))){
+	// 	spin_unlock(&my_table_lock);
+	// 	return -EINVAL;
+	// }
 
-	if ((cmd == REQUEST_SYSCALL_INTERCEPT && table[syscall].intercepted == 1) || (cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid) == 1)){
-		spin_unlock(&my_table_lock);
-		return -EBUSY;
-	}
+	// if ((cmd == REQUEST_SYSCALL_INTERCEPT && table[syscall].intercepted == 1) || (cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid) == 1)){
+	// 	spin_unlock(&my_table_lock);
+	// 	return -EBUSY;
+	// }
 
-	if (cmd == REQUEST_START_MONITORING &&  add_pid_sysc(pid, syscall) != 0){
-		spin_unlock(&my_table_lock);
-		return -ENOMEM;
-	}
+	// if (cmd == REQUEST_START_MONITORING &&  add_pid_sysc(pid, syscall) != 0){
+	// 	spin_unlock(&my_table_lock);
+	// 	return -ENOMEM;
+	// }
 
-	spin_unlock(&my_table_lock);
+	// spin_unlock(&my_table_lock);
 
-	if (cmd == REQUEST_SYSCALL_INTERCEPT) {
-		printk("Intercept prob");
-		// Lock access to kernel system call table.
-		spin_lock(&sys_call_table_lock);
-		spin_lock(&my_table_lock);
+	// if (cmd == REQUEST_SYSCALL_INTERCEPT) {
+	// 	printk("Intercept prob");
+	// 	// Lock access to kernel system call table.
+	// 	spin_lock(&sys_call_table_lock);
+	// 	spin_lock(&my_table_lock);
 
-		// Update the sys_call_table.
-		set_addr_rw((unsigned long) sys_call_table);
-		table[syscall].f = sys_call_table[syscall];
-		sys_call_table[syscall] = interceptor;
-		///table[syscall].intercepted = 1;
-		set_addr_ro((unsigned long) sys_call_table);
+	// 	// Update the sys_call_table.
+	// 	set_addr_rw((unsigned long) sys_call_table);
+	// 	table[syscall].f = sys_call_table[syscall];
+	// 	sys_call_table[syscall] = interceptor;
+	// 	///table[syscall].intercepted = 1;
+	// 	set_addr_ro((unsigned long) sys_call_table);
 
-		// Unlock the syslock table.
-		spin_unlock(&sys_call_table_lock);
+	// 	// Unlock the syslock table.
+	// 	spin_unlock(&sys_call_table_lock);
 
-		// Lock access to my table
-		spin_unlock(&my_table_lock);
+	// 	// Lock access to my table
+	// 	spin_unlock(&my_table_lock);
 
-	} else if (cmd == REQUEST_SYSCALL_RELEASE) {
-		printk("Release prob");
-		// Lock mytable.
-		spin_lock(&my_table_lock);
+	// } else if (cmd == REQUEST_SYSCALL_RELEASE) {
+	// 	printk("Release prob");
+	// 	// Lock mytable.
+	// 	spin_lock(&my_table_lock);
 
-		// Set up "mytable" for a syscall.
-		table[syscall].intercepted	= 0;
+	// 	// Set up "mytable" for a syscall.
+	// 	table[syscall].intercepted	= 0;
 
-		// destroys pid list and sets listCount and monitored to 0.
-		destroy_list(syscall);
+	// 	// destroys pid list and sets listCount and monitored to 0.
+	// 	destroy_list(syscall);
 
-		// Lock access to kernel system call table.
-		spin_lock(&sys_call_table_lock);
+	// 	// Lock access to kernel system call table.
+	// 	spin_lock(&sys_call_table_lock);
 
-		// Update the sys_call_table.
-		set_addr_rw((unsigned long)sys_call_table);
-		sys_call_table[syscall] = table[syscall].f;
-		set_addr_ro((unsigned long)sys_call_table);
+	// 	// Update the sys_call_table.
+	// 	set_addr_rw((unsigned long)sys_call_table);
+	// 	sys_call_table[syscall] = table[syscall].f;
+	// 	set_addr_ro((unsigned long)sys_call_table);
 
-		// Unlock the syslock table.
-		spin_unlock(&sys_call_table_lock);
-		// Unlock  mytable.
-		spin_unlock(&my_table_lock);
+	// 	// Unlock the syslock table.
+	// 	spin_unlock(&sys_call_table_lock);
+	// 	// Unlock  mytable.
+	// 	spin_unlock(&my_table_lock);
 	
-	} else if (cmd == REQUEST_START_MONITORING)	{
+	// } else if (cmd == REQUEST_START_MONITORING)	{
 
-		spin_lock(&my_table_lock);
+	// 	spin_lock(&my_table_lock);
 
-		// case1: pid == 0
-			// set monitored = 2
-			// del list
-		// case2: pid != 0
-			// TODO: How to update monitor here.
-			// case2.1: monitored == 1 ie monitor a pid
-				// add the pid to the pid list for the syscall.
-			// case2.2: monitored == 2 ie monitor all pids
-			// 	return -EBUSY
+	// 	// case1: pid == 0
+	// 		// set monitored = 2
+	// 		// del list
+	// 	// case2: pid != 0
+	// 		// TODO: How to update monitor here.
+	// 		// case2.1: monitored == 1 ie monitor a pid
+	// 			// add the pid to the pid list for the syscall.
+	// 		// case2.2: monitored == 2 ie monitor all pids
+	// 		// 	return -EBUSY
 
-		if (pid == 0) {
+	// 	if (pid == 0) {
 
-			destroy_list(syscall);
-			table[syscall].monitored = 2;
+	// 		destroy_list(syscall);
+	// 		table[syscall].monitored = 2;
 		
-		} else {
+	// 	} else {
 
-			if (table[syscall].monitored == 1) {
+	// 		if (table[syscall].monitored == 1) {
 				
-				if (add_pid_sysc(pid, syscall) != 0) {
+	// 			if (add_pid_sysc(pid, syscall) != 0) {
 
-					spin_unlock(&my_table_lock);
-					return -ENOMEM;
+	// 				spin_unlock(&my_table_lock);
+	// 				return -ENOMEM;
 
-				}
+	// 			}
 
-			} else if (table[syscall].monitored == 2) {
+	// 		} else if (table[syscall].monitored == 2) {
 
-				spin_unlock(&my_table_lock);
-				return -EBUSY;
+	// 			spin_unlock(&my_table_lock);
+	// 			return -EBUSY;
 
-			}
+	// 		}
 
-		}
+	// 	}
 
-		spin_unlock(&my_table_lock);
+	// 	spin_unlock(&my_table_lock);
 
-	} else if (cmd == REQUEST_STOP_MONITORING) {
+	// } else if (cmd == REQUEST_STOP_MONITORING) {
 
-		// case1: pid == 0
-			// set monitored = 0
-			// del list
-		// case2: pid != 0
-			// TODO: How to update monitor here.
-			// case2.1: monitored == 1 ie monitor a pid
-				// delete the pid to the pid list for the syscall.
-			// case2.2: monitored == 2 ie monitor all pids
-				// add the pid from the pid list.
+	// 	// case1: pid == 0
+	// 		// set monitored = 0
+	// 		// del list
+	// 	// case2: pid != 0
+	// 		// TODO: How to update monitor here.
+	// 		// case2.1: monitored == 1 ie monitor a pid
+	// 			// delete the pid to the pid list for the syscall.
+	// 		// case2.2: monitored == 2 ie monitor all pids
+	// 			// add the pid from the pid list.
 
-		if (pid == 0) {
+	// 	if (pid == 0) {
 
-			destroy_list(syscall);
+	// 		destroy_list(syscall);
 		
-		} else {
+	// 	} else {
 
-			if (table[syscall].monitored == 1) {
+	// 		if (table[syscall].monitored == 1) {
 				
-				if (del_pid_sysc(pid, syscall) != 0) {
+	// 			if (del_pid_sysc(pid, syscall) != 0) {
 
-					spin_unlock(&my_table_lock);
-					return -ENOMEM;
+	// 				spin_unlock(&my_table_lock);
+	// 				return -ENOMEM;
 
-				}
+	// 			}
 
-			} else if (table[syscall].monitored == 2) {
+	// 		} else if (table[syscall].monitored == 2) {
 
-				if (add_pid_sysc(pid, syscall) != 0) {
+	// 			if (add_pid_sysc(pid, syscall) != 0) {
 
-					spin_unlock(&my_table_lock);
-					return -ENOMEM;
+	// 				spin_unlock(&my_table_lock);
+	// 				return -ENOMEM;
 
-				}
+	// 			}
 
-			}
+	// 		}
 
-		}
+	// 	}
 
-		spin_unlock(&my_table_lock);
+	// 	spin_unlock(&my_table_lock);
 
-	}
+	// }
 	
 
 
@@ -567,7 +570,7 @@ static int init_function(void) {
 	set_addr_rw((unsigned long) sys_call_table);
 
 	// Hijack __NR_exit_group and replace with my_exit_group
-	//sys_call_table[__NR_exit_group] = my_exit_group;
+	sys_call_table[__NR_exit_group] = my_exit_group;
 	
 	sys_call_table[MY_CUSTOM_SYSCALL] = my_syscall;
 
@@ -582,16 +585,12 @@ static int init_function(void) {
 	for (i = 1; i < NR_syscalls; i++)
 	{
 		
-		if (i != __NR_exit_group)
-		{
-			
-			// Set up "mytable" for a syscall.
-			table[i].f				= sys_call_table[i];
-			table[i].intercepted	= 0;
-			table[i].monitored 		= 0;
-			table[i].listcount 		= 0;
-			INIT_LIST_HEAD (&table[i].my_list);
-		}
+		// Set up "mytable" for a syscall.
+		table[i].f				= sys_call_table[i];
+		table[i].intercepted	= 0;
+		table[i].monitored 		= 0;
+		table[i].listcount 		= 0;
+		INIT_LIST_HEAD (&table[i].my_list);
 
 	}
 
