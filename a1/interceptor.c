@@ -316,6 +316,8 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 		if (check_pid_monitored(reg.ax, current->pid) == 1)
 		{
+			// unlock access to my_table
+			spin_unlock(&my_table_lock);
 			// Log the message
 			log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
 		}
@@ -323,8 +325,14 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 	}
 
+	// store the org call
+	asmlinkage long (*f)(struct pt_regs) = (table[reg.ax].f);
+
+	// unlock access to my_table
+	spin_unlock(&my_table_lock);
+
 	// Call the original system call
-	return (*(table[reg.ax].f))(reg);
+	return *f(reg);
 }
 
 /**
