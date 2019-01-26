@@ -29,6 +29,7 @@ int vsyscall_arg(int sno, int n, ...) {
 	va_end(va);
 	
 	ret = syscall(sno, args[0], args[1], args[2]);
+	printf(" %d is ret\n", ret);
 	if(ret) ret = -errno;
 	return ret;
 }
