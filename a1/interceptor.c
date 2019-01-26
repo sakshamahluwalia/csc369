@@ -326,7 +326,7 @@ asmlinkage long interceptor(struct pt_regs reg) {
 	}
 
 	// store the org call
-	int ret_val = (table[reg.ax].f)(reg);
+	asmlinkage ret_val = (table[reg.ax].f)(reg);
 
 	// unlock access to my_table
 	spin_unlock(&my_table_lock);
