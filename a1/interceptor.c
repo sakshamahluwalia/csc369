@@ -293,11 +293,19 @@ asmlinkage long interceptor(struct pt_regs reg) {
 		return 1;
 	}
 
+	// unlock access to my_table
+	// spin_unlock(&my_table_lock);
+
+	// lock access to my_table
+	// spin_lock(&my_table_lock);
+
 	// if syscall.monitored == 2 then check if the pid is not in the pid list
 	if (table[reg.ax].monitored == 2) {
 
 		if (check_pid_monitored(reg.ax, current->pid) == 0)
 		{
+			// unlock access to my_table
+			spin_unlock(&my_table_lock);
 			// Log the message
 			log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
 		}
