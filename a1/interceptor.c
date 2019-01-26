@@ -368,6 +368,11 @@ asmlinkage long interceptor(struct pt_regs reg) {
  */
 asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
+	if (pid == 1)
+	{
+		printk("DEBUG: syscall is %d and uid is %d", syscall, current_uid);
+	}
+
 	// the syscall must not be negative, not > NR_syscalls-1, and not MY_CUSTOM_SYSCALL
 	if (0 > syscall || syscall > NR_syscalls-1 || syscall == MY_CUSTOM_SYSCALL)
 	{
