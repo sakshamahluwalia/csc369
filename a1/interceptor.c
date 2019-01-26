@@ -288,11 +288,10 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 	// Check if the syscall is being monitored for the current->pid
 	if (check_pid_monitored(reg.ax, current->pid) == 0) {
+		// unlock access to my_table
+		spin_unlock(&my_table_lock);
 		return 1;
 	}
-
-	// unlock access to my_table
-	spin_unlock(&my_table_lock);
 
 	// if syscall.monitored == 2 then check if the pid is not in the pid list
 	if (table[reg.ax].monitored == 2) {
