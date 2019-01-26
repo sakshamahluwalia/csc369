@@ -379,6 +379,17 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		return -EINVAL;
 	}
 
+	// check the pid for the last two cmds
+	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING)
+	{
+
+		// pid cannot be a negative integer and it must be an existing pid.
+		if (pid < 0 || (pid != 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) ) {
+			return -EINVAL;
+		}
+
+	}
+
 	// For the first two commands, we must be root.
 	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE) 
 	{
@@ -390,24 +401,15 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		// calling process is not root
 		if (current_uid() != 0) {
 
+			// if 'pid' is 0 and calling process is not root, then access is denied
+			if (pid == 0) { return -EINVAL; }
+
 			// check if the 'pid' requested is owned by the calling process 
 			if (check_pids_same_owner(pid, current->pid) != 0) { 
 				printk("DEBUG: return eperm\n");
 				return -EPERM;
 			}
-			// if 'pid' is 0 and calling process is not root, then access is denied
-			if (pid == 0) { return -EINVAL; }
 
-		} else {
-
-			// pid cannot be a negative integer and it must be an existing pid.
-			if (pid < 0) {
-				printk("DEBUG: not a valid task \n ");
-				return -EINVAL;
-			} else if (pid != 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
-				printk("DEBUG: not a valid task \n ");
-				return -EINVAL;	
-			}
 		}
 	}
 
@@ -416,7 +418,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 	// Cannot de-intercept a system call that has not been intercepted yet.
 	if (cmd == REQUEST_SYSCALL_RELEASE && table[syscall].intercepted == 0)
-	{	
+	{
 		spin_unlock(&my_table_lock);
 		return -EINVAL;
 	}
@@ -427,7 +429,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	if (cmd == REQUEST_STOP_MONITORING)
 	{
 		if (table[syscall].intercepted == 0 || table[syscall].monitored == 0 
-			|| check_pid_monitored(syscall, pid) == 0) {
+			|| (pid != 0 && check_pid_monitored(syscall, pid) == 0)) {
 
 			spin_unlock(&my_table_lock);
 			return -EINVAL;
@@ -442,7 +444,8 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	}
 
 	// If monitoring a pid that is already being monitored
-	if (cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid) == 1) { 
+	if (cmd == REQUEST_START_MONITORING && (pid != 0 && 
+			check_pid_monitored(syscall, pid) == 1)) { 
 		spin_unlock(&my_table_lock);
 		return -EBUSY;
 	}
