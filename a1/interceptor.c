@@ -305,7 +305,7 @@ asmlinkage long interceptor(struct pt_regs reg) {
 		if (check_pid_monitored(reg.ax, current->pid) == 0)
 		{
 			// unlock access to my_table
-			spin_unlock(&my_table_lock);
+			// spin_unlock(&my_table_lock);
 			// Log the message
 			log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
 		}
@@ -317,7 +317,7 @@ asmlinkage long interceptor(struct pt_regs reg) {
 		if (check_pid_monitored(reg.ax, current->pid) == 1)
 		{
 			// unlock access to my_table
-			spin_unlock(&my_table_lock);
+			// spin_unlock(&my_table_lock);
 			// Log the message
 			log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
 		}
@@ -501,10 +501,13 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 			// case2.2: monitored == 2 ie monitor all pids
 			// 	return -EBUSY
 
+		// lock my_table
+		spin_lock(&my_table_lock);
+
 		if (pid == 0) {
 
-			// lock my_table
-			spin_lock(&my_table_lock);
+			// // lock my_table
+			// spin_lock(&my_table_lock);
 
 			destroy_list(syscall);
 			table[syscall].monitored = 2;
@@ -514,8 +517,8 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		
 		} else {
 
-			// lock my_table
-			spin_lock(&my_table_lock);
+			// // lock my_table
+			// spin_lock(&my_table_lock);
 
 			if (table[syscall].monitored == 2) {
 
@@ -549,11 +552,13 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 				// delete the pid to the pid list for the syscall.
 			// case2.2: monitored == 2 ie monitor all pids
 				// add the pid from the pid list.
+		// lock my_table
+		spin_lock(&my_table_lock);
 
 		if (pid == 0) {
 
-			// lock my_table
-			spin_lock(&my_table_lock);
+			// // lock my_table
+			// spin_lock(&my_table_lock);
 
 			destroy_list(syscall);
 
@@ -562,8 +567,8 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		
 		} else {
 
-			// lock my_table
-			spin_lock(&my_table_lock);
+			// // lock my_table
+			// spin_lock(&my_table_lock);
 
 			if (table[syscall].monitored == 1) {
 
