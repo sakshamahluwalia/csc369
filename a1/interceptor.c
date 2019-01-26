@@ -400,15 +400,18 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 		}
 
-		// pid cannot be a negative integer and it must be an existing pid.
-		if (pid < 0 || pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
+		// // pid cannot be a negative integer and it must be an existing pid.
+		// if (pid < 0 || pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
 
 
-			printk("DEBUG: not a valid task \n ");
+		// 	printk("DEBUG: not a valid task \n ");
 
 
-			return -EINVAL;
-		}
+		// 	return -EINVAL;
+		// }
+		
+		if(pid < 0) return -EINVAL;
+		else if(pid > 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) return -EINVAL;
 
 	}
 
