@@ -407,8 +407,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 			if (pid < 0) {
 				printk("DEBUG: not a valid task \n ");
 				return -EINVAL;
-			} else if (pid != 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL)
-			{
+			} else if (pid != 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
 				printk("DEBUG: not a valid task \n ");
 				return -EINVAL;	
 			}
@@ -432,8 +431,9 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	*/
 	if (cmd == REQUEST_STOP_MONITORING)
 	{
-		if (table[syscall].intercepted == 0 || check_pid_monitored(syscall, pid) == 0) {	
-			printk("DEBUG: not being monitored intercepted is set to be: %d \n", table[syscall].intercepted);
+		if (table[syscall].intercepted == 0 || table[syscall].monitored == 0 
+			|| check_pid_monitored(syscall, pid) == 0) {
+
 			spin_unlock(&my_table_lock);
 			return -EINVAL;
 		}
@@ -590,20 +590,20 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 			// // lock my_table
 			// spin_lock(&my_table_lock);
 
-			if (table[syscall].monitored == 1) {
+			if (table[syscall].monitored == 2) {
 
-				printk("DEBUG: call being monitored");
-
-				if (del_pid_sysc(pid, syscall) != 0) {
+				if (add_pid_sysc(pid, syscall) != 0) {
 
 					spin_unlock(&my_table_lock);
 					return -ENOMEM;
 
 				}
 
-			} else if (table[syscall].monitored == 2) {
+			} else {
 
-				if (add_pid_sysc(pid, syscall) != 0) {
+				printk("DEBUG: call being monitored");
+
+				if (del_pid_sysc(pid, syscall) != 0) {
 
 					spin_unlock(&my_table_lock);
 					return -ENOMEM;
