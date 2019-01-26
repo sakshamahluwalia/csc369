@@ -512,8 +512,8 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 			destroy_list(syscall);
 			table[syscall].monitored = 2;
 
-			// unlock my_table
-			spin_unlock(&my_table_lock);
+			// // unlock my_table
+			// spin_unlock(&my_table_lock);
 		
 		} else {
 
@@ -562,8 +562,8 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 			destroy_list(syscall);
 
-			// unlock my_table
-			spin_unlock(&my_table_lock);
+			// // unlock my_table
+			// spin_unlock(&my_table_lock);
 		
 		} else {
 
