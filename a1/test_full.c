@@ -188,10 +188,11 @@ void test_syscall(int syscall) {
 	do_as_guest("./test_full stop %d 1 %d", syscall, -EPERM);
 	printf("works9\n");
 	do_stop(syscall, 1, 0);
-	do_as_guest("./test_full start %d -1 %d", syscall, 0);
 	printf("works10\n");
-	do_stop(syscall, last_child, -EINVAL);
+	do_as_guest("./test_full start %d -1 %d", syscall, 0);
 	printf("works11\n");
+	do_stop(syscall, last_child, -EINVAL);
+	printf("works12\n");
 	do_release(syscall, 0);
 	printf("end\n");
 }
