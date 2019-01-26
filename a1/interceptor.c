@@ -374,86 +374,146 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	// }
 
 	// the syscall must not be negative, not > NR_syscalls-1, and not MY_CUSTOM_SYSCALL
-	if (0 > syscall || syscall > NR_syscalls-1 || syscall == MY_CUSTOM_SYSCALL)
-	{
-		return -EINVAL;
-	}
+// -------------------------------------------------------------------------------------
+	// if (0 > syscall || syscall > NR_syscalls-1 || syscall == MY_CUSTOM_SYSCALL)
+	// {
+	// 	return -EINVAL;
+	// }
 
-	// For the first two commands, we must be root.
-	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE) 
-	{
-		if (current_uid() != 0) { return -EPERM; }
-	}
+	// // For the first two commands, we must be root.
+	// if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE) 
+	// {
+	// 	if (current_uid() != 0) { return -EPERM; }
+	// }
 
-	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING) 
-	{	
-		// calling process is not root
-		if (current_uid() != 0) {
+	// if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING) 
+	// {	
+	// 	// calling process is not root
+	// 	if (current_uid() != 0) {
 
-			// check if the 'pid' requested is owned by the calling process 
-			if (check_pids_same_owner(pid, current->pid) != 0) { 
-				printk("DEBUG: return eperm\n");
-				return -EPERM;
-			}
-			// if 'pid' is 0 and calling process is not root, then access is denied
-			if (pid == 0) { return -EINVAL; }
+	// 		// check if the 'pid' requested is owned by the calling process 
+	// 		if (check_pids_same_owner(pid, current->pid) != 0) { 
+	// 			printk("DEBUG: return eperm\n");
+	// 			return -EPERM;
+	// 		}
+	// 		// if 'pid' is 0 and calling process is not root, then access is denied
+	// 		if (pid == 0) { return -EINVAL; }
 
-		}
+	// 	}
 
-		// pid cannot be a negative integer and it must be an existing pid.
-		if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING)
-		{
+	// 	// pid cannot be a negative integer and it must be an existing pid.
+	// 	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING)
+	// 	{
 
-			if (pid < 0) {
-				printk("DEBUG: not a valid task \n ");
-				return -EINVAL;
-			} else if (pid != 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
-				printk("DEBUG: not a valid task \n ");
-				return -EINVAL;	
-			}
+	// 		if (pid < 0) {
+	// 			printk("DEBUG: not a valid task \n ");
+	// 			return -EINVAL;
+	// 		} else if (pid != 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
+	// 			printk("DEBUG: not a valid task \n ");
+	// 			return -EINVAL;	
+	// 		}
 
-		}
+	// 	}
 
-	}
+	// }
 
-	// lock access to my_table
-	spin_lock(&my_table_lock);
+	// // lock access to my_table
+	// spin_lock(&my_table_lock);
 
-	// Cannot de-intercept a system call that has not been intercepted yet.
-	if (cmd == REQUEST_SYSCALL_RELEASE && table[syscall].intercepted == 0)
-	{	
-		spin_unlock(&my_table_lock);
-		return -EINVAL;
-	}
+	// // Cannot de-intercept a system call that has not been intercepted yet.
+	// if (cmd == REQUEST_SYSCALL_RELEASE && table[syscall].intercepted == 0)
+	// {	
+	// 	spin_unlock(&my_table_lock);
+	// 	return -EINVAL;
+	// }
 
-	/* Cannot stop monitoring for a pid that is not being monitored, 
-	*  or if the system call has not been intercepted yet.
-	*/
-	if (cmd == REQUEST_STOP_MONITORING)
-	{
-		if (table[syscall].intercepted == 0 || table[syscall].monitored == 0 
-			|| check_pid_monitored(syscall, pid) == 0) {
+	// /* Cannot stop monitoring for a pid that is not being monitored, 
+	// *  or if the system call has not been intercepted yet.
+	// */
+	// if (cmd == REQUEST_STOP_MONITORING)
+	// {
+	// 	if (table[syscall].intercepted == 0 || table[syscall].monitored == 0 
+	// 		|| check_pid_monitored(syscall, pid) == 0) {
 
-			spin_unlock(&my_table_lock);
-			return -EINVAL;
-		}
-	}
+	// 		spin_unlock(&my_table_lock);
+	// 		return -EINVAL;
+	// 	}
+	// }
 
-	// If intercepting a system call that is already intercepted.
-	if (cmd == REQUEST_SYSCALL_INTERCEPT && table[syscall].intercepted == 1)
-	{	
-		spin_unlock(&my_table_lock);
-		return -EBUSY;
-	}
+	// // If intercepting a system call that is already intercepted.
+	// if (cmd == REQUEST_SYSCALL_INTERCEPT && table[syscall].intercepted == 1)
+	// {	
+	// 	spin_unlock(&my_table_lock);
+	// 	return -EBUSY;
+	// }
 
-	// If monitoring a pid that is already being monitored
-	if (cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid) == 1) { 
-		spin_unlock(&my_table_lock);
-		return -EBUSY;
-	}
+	// // If monitoring a pid that is already being monitored
+	// if (cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid) == 1) { 
+	// 	spin_unlock(&my_table_lock);
+	// 	return -EBUSY;
+	// }
 
-	spin_unlock(&my_table_lock);
+	// spin_unlock(&my_table_lock);
+// --------------------------------------------------------------------------------------
 	
+	if(syscall < 0 || syscall  > NR_syscalls || syscall == MY_CUSTOM_SYSCALL) {
+		return -EINVAL;
+	}
+
+	// Check if pid is valid for last two commands
+	if(cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING) {
+
+		if(pid < 0) return -EINVAL;
+		else if(pid > 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) return -EINVAL;
+
+	}
+	
+
+	// (B) Check that the caller have right permissions
+	// Have to root for first two commands
+	if(cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE) {
+		if(current_uid() != 0) return -EPERM;
+	}
+
+	// The last two commands
+	else if(cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING) {
+		// If not root
+		if(current_uid() != 0) {
+			// Non-root caller don't have permission to monitor all system calls
+			if(pid == 0) return -EPERM;
+			// Check if the 'pid' requested is owned by the calling process
+			else if(check_pids_same_owner(pid, current -> pid) != 0) return -EPERM;
+		}
+
+	}
+
+
+	// (C) Check for correct context of commands
+	// Cannot de-intercept a syscall not intercepted yet
+	if(cmd == REQUEST_SYSCALL_RELEASE && table[syscall].intercepted == 0) {
+		return -EINVAL;
+	}
+	// Cannot stop monitoring for a pid that is not being monitored or intercepted
+	else if(cmd == REQUEST_STOP_MONITORING) {
+
+		if(table[syscall].intercepted == 0) return -EINVAL;
+		// else if(check_pid_monitored(syscall, pid) == 0) return -EINVAL;
+		else if(pid != 0 && check_pid_monitored(syscall, pid) == 0) return -EINVAL;
+
+	}
+
+	
+	// (D) Check for -EBUSY conditions:
+	// System call already intercepted
+	if(cmd == REQUEST_SYSCALL_INTERCEPT && table[syscall].intercepted) {
+		return -EBUSY;
+	}
+	// Pid already monitored
+	else if(cmd == REQUEST_START_MONITORING && check_pid_monitored(syscall, pid)) {
+		return -EBUSY;
+	}
+
+
 
 	if (cmd == REQUEST_SYSCALL_INTERCEPT) {
 		
