@@ -368,10 +368,10 @@ asmlinkage long interceptor(struct pt_regs reg) {
  */
 asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
-	if (pid == 1)
-	{
-		printk("DEBUG: syscall is %d and uid is %d", syscall, current_uid());
-	}
+	// if (pid == 1)
+	// {
+	// 	printk("DEBUG: syscall is %d and uid is %d", syscall, current_uid());
+	// }
 
 	// the syscall must not be negative, not > NR_syscalls-1, and not MY_CUSTOM_SYSCALL
 	if (0 > syscall || syscall > NR_syscalls-1 || syscall == MY_CUSTOM_SYSCALL)
@@ -399,6 +399,11 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 		// pid cannot be a negative integer and it must be an existing pid.
 		if (pid < 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
+
+
+			printk("DEBUG: not a valid task \n ");
+
+
 			return -EINVAL;
 		}
 
@@ -419,6 +424,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	if (cmd == REQUEST_STOP_MONITORING)
 	{
 		if (table[syscall].intercepted == 0 || check_pid_monitored(syscall, pid) == 1) {	
+			printk("DEBUG: not being monitored intercepted is set to be: %d \n", table[syscall].intercepted);
 			spin_unlock(&my_table_lock);
 			return -EINVAL;
 		}
