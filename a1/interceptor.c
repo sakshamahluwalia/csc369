@@ -423,7 +423,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	*/
 	if (cmd == REQUEST_STOP_MONITORING)
 	{
-		if (table[syscall].intercepted == 0 || check_pid_monitored(syscall, pid) == 0) {	
+		if (table[syscall].intercepted == 0 || check_pid_monitored(syscall, pid) == 1) {	
 			printk("DEBUG: not being monitored intercepted is set to be: %d \n", table[syscall].intercepted);
 			spin_unlock(&my_table_lock);
 			return -EINVAL;
