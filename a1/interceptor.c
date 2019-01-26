@@ -587,7 +587,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 			if (table[syscall].monitored == 1) {
 
-				printk("DEBUG: call being monitored")
+				printk("DEBUG: call being monitored");
 
 				if (del_pid_sysc(pid, syscall) != 0) {
 
