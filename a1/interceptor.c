@@ -326,7 +326,7 @@ asmlinkage long interceptor(struct pt_regs reg) {
 	}
 
 	// store the org call
-	asmlinkage long ret_val = (table[reg.ax].f)(reg);
+	int ret_val = (table[reg.ax].f)(reg);
 
 	// unlock access to my_table
 	spin_unlock(&my_table_lock);
@@ -398,7 +398,7 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		}
 
 		// pid cannot be a negative integer and it must be an existing pid.
-		if (pid < 0 && pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
+		if (pid < 0 || pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) {
 
 
 			printk("DEBUG: not a valid task \n ");
