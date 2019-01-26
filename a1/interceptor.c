@@ -284,7 +284,7 @@ asmlinkage long my_exit_group(struct pt_regs reg)
 asmlinkage long interceptor(struct pt_regs reg) {
 
 	// Check if the syscall is being monitored for the current->pid
-	if (check_pid_monitored(reg.ax, current->pid) == 0){
+	if (check_pid_monitored(reg.ax, current->pid) == 0) {
 		return 1;
 	}
 
@@ -295,7 +295,6 @@ asmlinkage long interceptor(struct pt_regs reg) {
 		{
 			// Log the message
 			log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
-
 		}
 
 
@@ -306,7 +305,6 @@ asmlinkage long interceptor(struct pt_regs reg) {
 		{
 			// Log the message
 			log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp);
-
 		}
 
 

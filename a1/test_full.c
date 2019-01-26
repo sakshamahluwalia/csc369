@@ -169,18 +169,30 @@ int do_nonroot(int syscall) {
 void test_syscall(int syscall) {
 
 	//clear_log();
+	printf("works1\n");
 	do_intercept(syscall, 0);
+	printf("works2\n");
 	do_intercept(syscall, -EBUSY);
+	printf("works3\n");
 	do_as_guest("./test_full nonroot %d", syscall, 0);
+	printf("works4\n");
 	do_start(syscall, -2, -EINVAL);
+	printf("works5\n");
 	do_start(syscall, 0, 0);
+	printf("works6\n");
 	do_stop(syscall, 0, 0);
+	printf("works7\n");
 	do_start(syscall, 1, 0);
+	printf("works8\n");
 	do_as_guest("./test_full stop %d 1 %d", syscall, -EPERM);
+	printf("works9\n");
 	do_stop(syscall, 1, 0);
 	do_as_guest("./test_full start %d -1 %d", syscall, 0);
+	printf("works10\n");
 	do_stop(syscall, last_child, -EINVAL);
+	printf("works11\n");
 	do_release(syscall, 0);
+	printf("end\n");
 }
 
 
