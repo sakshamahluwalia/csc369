@@ -66,3 +66,9 @@ void initConditionVariable(pthread_cond_t* cond);
 * @param mutex pointer to the mutex to unlock.
 */
 void unlock(pthread_mutex_t* mutex);
+
+
+/* New functions */
+void destroyMutex(pthread_mutex_t* mutex);
+
+void lock(pthread_mutex_t* mutex);

@@ -10,49 +10,71 @@ void initSafeStopSign(SafeStopSign* sign, int count) {
 	// Initialize SafeStopSign given number of cars in simulation (count)
 	initStopSign(&sign->base, count);
 
-	// TODO: Add any initialization logic you need.
-	// **** Where to initialize and how many? *****
-	// pthread_cond_t enterLaneEmpty = PTHREAD_COND_INITIALIZER;
-	// pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+	for (int i = 0; i < DIRECTION_COUNT; ++i)
+	{
+		initMutex(&sign->lane[i]);
+		initMutex(&sign->quad[i]);
+	}
+	// TODO: Initialize condition variables
 }
 
 void destroySafeStopSign(SafeStopSign* sign) {
 	destroyStopSign(&sign->base);
 
 	// TODO: Add any logic you need to clean up data structures.
+	for (int i = 0; i < DIRECTION_COUNT; ++i)
+	{
+		destroyMutex(&sign->lane[i]);
+		destroyMutex(&sign->quad[i]);
+	}
+	// TODO: Destroy condition variables
 }
 
 void runStopSignCar(Car* car, SafeStopSign* sign) {
 
-	// TODO: Add your synchronization logic to this function.
+	int dir = getLaneIndex(car);
 
-	// Get the lock
-// 	pthread_mutext_lock(&mutex);
+	// Get the lane the car is trying to go through and enter
+	EntryLane* lane = getLane(car, &sign->base);
 
-// 	// Get the lane the car is trying to go through and enter
-// 	EntryLane* lane = getLane(car, &sign->base);
+	// Get the quadrants the car will go through
+	int quad_count;
+	quad_count = getStopSignRequiredQuadrants(car, sign->quad_indexes);
 
-// // Add sync here for lane.
+	/*** Add sync here for lane. ***/
 
-// 	// Car enters lane and is given token
-// 	enterLane(car, lane);
+ 	// TODO: Wait if previous car has not exited the entry lane
 
-// 	// Block if previous car has not exited the entry lane
-// 	while (lane.enterCounter != lane.exitCounter){
-// 		pthread_cond_wait(&enterLaneEmpty, &mutex);
-// 	}
+	// TODO: Wait if the quadrants are not empty
 
-// 	// **** Checking collision detection handled here or already handled? ****
+	// get the lock
+	lock(&sign->lane[dir]);
 
-// 	// Go through the stop sign
-// 	goThroughStopSign(car, &sign->base);
+	int index;
+	for (int i = 0; i < quad_count; ++i)
+	{
+		index = sign->quad_indexes[i];
+		lock(&sign->quad[index]);
+	}
 
-// 	// Exit
-// 	exitIntersection(car, lane);
+	// Car enters lane and is given token
+	enterLane(car, lane);
 
-// 	// Car exited so signal next car waiting on lane
-// 	pthread_cond_signal(&laneEmpty);
+	// Go through the stop sign
+	goThroughStopSign(car, &sign->base);
 
-// 	// Unlock
-// 	pthread_mutex_unlock(&mutex);
+	// Exit
+	exitIntersection(car, lane);
+
+	// Unlock
+	for (int i = 0; i < quad_count; ++i)
+	{
+		index = sign->quad_indexes[i];
+		unlock(&sign->quad[index]);
+	}
+
+	unlock(&sign->lane[dir]);
+
+	// Car exited so signal next car waiting on lane
+	// pthread_cond_signal(&laneEmpty);
 }

@@ -10,7 +10,6 @@ void initMutexAccessValidator(MutexAccessValidator* validator) {
 	validator->current = NULL;
 }
 
-
 void destructMutexAccessValidator(MutexAccessValidator* validator) {
 	pthread_mutex_destroy(&validator->lock);
 }

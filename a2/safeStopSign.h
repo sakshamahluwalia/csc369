@@ -25,8 +25,14 @@ typedef struct _SafeStopSign {
 	*/
 	StopSign base;
 
+	int quad_indexes[QUADRANT_COUNT];
+
 	// TODO: Add any members you need for synchronization here.
-	
+	pthread_mutex_t lane[DIRECTION_COUNT];
+
+	pthread_mutex_t quad[QUADRANT_COUNT];
+
+	// TODO: Add cvs to check if quadrants and lanes are in use.
 
 } SafeStopSign;
 
