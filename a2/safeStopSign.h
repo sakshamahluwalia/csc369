@@ -7,6 +7,26 @@
 #include "car.h"
 #include "stopSign.h"
 
+/* This struct will be used to lock/unlock a quadrant. */
+typedef struct _quadrant {
+
+	int is_quad_locked;
+	pthread_mutex_t quad_lock;
+	pthread_cond_t quad_condition;
+
+} quadrant;
+
+/* Struct containing locks for the lane and the queue of cars that have entered. */
+typedef struct _lane {
+
+	Car **car_queue;
+
+	int queue_index;
+
+	pthread_mutex_t lane_lock;
+
+} Lane;
+
 /**
 * @brief Structure that you can modify as part of your solution to implement
 * proper synchronization for the stop sign intersection.
@@ -25,14 +45,16 @@ typedef struct _SafeStopSign {
 	*/
 	StopSign base;
 
+	pthread_mutex_t intersection_lock;
+
+	// We will use this to access a quadrant in quad.
 	int quad_indexes[QUADRANT_COUNT];
 
 	// TODO: Add any members you need for synchronization here.
-	pthread_mutex_t lane[DIRECTION_COUNT];
+	Lane lanes[DIRECTION_COUNT];
 
-	pthread_mutex_t quad[QUADRANT_COUNT];
-
-	// TODO: Add cvs to check if quadrants and lanes are in use.
+	// 4 quadrants
+	quadrant quad[QUADRANT_COUNT];
 
 } SafeStopSign;
 

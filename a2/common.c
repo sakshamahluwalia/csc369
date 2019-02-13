@@ -69,6 +69,14 @@ void initConditionVariable(pthread_cond_t* cond) {
 	}
 }
 
+void destroyConditionVariable(pthread_cond_t* cond) {
+	int returnValue = pthread_cond_destroy(cond);
+	if (returnValue != 0) {
+		perror("Condition variable destruction failed."
+				"@ " __FILE__ " : " LINE_STRING "\n");	
+	}
+}
+
 void unlock(pthread_mutex_t* mutex) {
 	int returnValue = pthread_mutex_unlock(mutex);
 	if (returnValue != 0) {
@@ -81,6 +89,14 @@ void lock(pthread_mutex_t* mutex) {
 	int returnValue = pthread_mutex_lock(mutex);
 	if (returnValue != 0) {
 		perror("Mutex unlock failed."
+				"@ " __FILE__ " : " LINE_STRING "\n");	
+	}
+}
+
+void wait(pthread_cond_t *cond, pthread_mutex_t *mutex) {
+	int returnValue = pthread_cond_wait(cond, mutex);
+	if (returnValue != 0) {
+		perror("Condition wait failed."
 				"@ " __FILE__ " : " LINE_STRING "\n");	
 	}
 }
