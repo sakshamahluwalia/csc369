@@ -19,6 +19,8 @@ void initSafeStopSign(SafeStopSign* sign, int count) {
 		initMutex(&sign->quad[i].quad_lock);
 		initConditionVariable(&sign->quad[i].quad_condition);
 		sign->lanes[i].car_queue = malloc(sizeof(Car *) * count);
+		initMutex(&sign->lanes[i].exit_lock);
+		initConditionVariable(&sign->lanes[i].exit_condition);
 	}
 }
 
@@ -32,7 +34,9 @@ void destroySafeStopSign(SafeStopSign* sign) {
 	{
 		destroyMutex(&sign->lanes[i].lane_lock);
 		destroyMutex(&sign->quad[i].quad_lock);
+		destroyMutex(&sign->lanes[i].exit_lock);
 		destroyConditionVariable(&sign->quad[i].quad_condition);
+		destroyConditionVariable(&sign->lanes[i].exit_condition);
 		free(sign->lanes[i].car_queue);
 	}
 
@@ -50,12 +54,16 @@ void runStopSignCar(Car* car, SafeStopSign* sign) {
 	enterLane(car, lane);
 
 	// Add Car to the queue
-	sign->lanes[dir].car_queue[sign->lanes[dir].queue_index] = car;
+	int car_index = sign->lanes[dir].queue_index;
+	sign->lanes[dir].car_queue[car_index] = car;
+	if (car_index == 0) {
+		sign->lanes[dir].next_car_exit = car;
+	}
 	sign->lanes[dir].queue_index++;
+	printf("Car %d entering lane %d\n", car_index, dir);
 
 	// Get the quadrants the car will go through
-	int quad_count;
-	quad_count = getStopSignRequiredQuadrants(car, sign->quad_indexes);
+	int quad_count = getStopSignRequiredQuadrants(car, sign->quad_indexes);
 
 	// Check that quadrants are available. Block if not available.
 	int index;
@@ -68,15 +76,29 @@ void runStopSignCar(Car* car, SafeStopSign* sign) {
 				break;
 			}
 		}
-		if (i == quad_count) {
+		// if (i == quad_count) {
+		// 	printf("Car %d blocked at lane %d\n", car_index, dir);
+		// 	pthread_cond_wait(&(sign->quad[index].quad_condition), &(sign->quad[index].quad_lock));
+		// 	break;
+		// }
+		if (i == quad_count){
+			printf("Car %d going through intersection %d\n", car_index, sign->quad_indexes[0]);
 			break;
 		}
 	}
 
+	for (int i = 0; i < quad_count; i++){
+		lock(&sign->quad[sign->quad_indexes[i]].quad_lock);
+		sign->quad[sign->quad_indexes[i]].is_quad_locked = 1;
+	}
+
+	lock(&sign->intersection_lock);
 	// Go through the stop sign
 	goThroughStopSign(car, &sign->base);
 
-	// Unlock the lane
+	unlock(&sign->intersection_lock);
+
+	// Unlock the lane so other cars can enter the lane
 	unlock(&sign->lanes[dir].lane_lock);
 
 	// Wake up other threads waiting for the quadrants and unlock the quadrants
@@ -88,44 +110,16 @@ void runStopSignCar(Car* car, SafeStopSign* sign) {
 	}
 
 	// Exit simulation
-	exitIntersection(car, lane);
+	lock(&sign->lanes[dir].exit_lock);
 
-	// /*** Add sync here for lane. ***/
-	// TODO: Wait if the quadrants are not empty
-
-	// Car enters lane and is given token
-	// lock(&sign->intersection_lock);
-	lock(&sign->lanes[dir].lane_lock);
-	// unlock(&sign->intersection_lock);
-	enterLane(car, lane);
-
-	// lock(&sign->intersection_lock);
-	for (int i = 0; i < quad_count; ++i)
-	{	
-		// printf("initiallock %d\n", i);
-		index = sign->quad_indexes[i];
-		sign->quad[index].is_quad_locked = 1;
-		lock(&sign->quad[index].quad_lock);
-		// printf("afterlock %d\n", i);
-	}
-	// unlock(&sign->intersection_lock);
-
-	// Go through the stop sign
-	lock(&sign->intersection_lock);
-	goThroughStopSign(car, &sign->base);
-	unlock(&sign->lanes[dir].lane_lock);
-	unlock(&sign->intersection_lock);
-
-	// logic to check if they exit in order.
-
-	for (int i = 0; i < quad_count; ++i)
-	{
-		index = sign->quad_indexes[i];
-		sign->quad[index].is_quad_locked = 0;
-		unlock(&sign->quad[index].quad_lock);
-		pthread_cond_broadcast(&sign->quad[index].quad_condition);
+	while (sign->lanes[dir].next_car_exit != sign->lanes[dir].car_queue[car_index]){
+		pthread_cond_wait(&sign->lanes[dir].exit_condition, &sign->lanes[dir].exit_lock);
 	}
 
-	// Exit
+	printf("Car %d exiting lane %d\n", car_index, dir);
 	exitIntersection(car, lane);
+	sign->lanes[dir].next_car_exit = sign->lanes[dir].car_queue[car_index++];
+
+	unlock(&sign->lanes[dir].exit_lock);
+	pthread_cond_broadcast(&sign->lanes[dir].exit_condition);
 }

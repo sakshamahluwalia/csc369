@@ -21,9 +21,15 @@ typedef struct _lane {
 
 	Car **car_queue;
 
+	Car *next_car_exit;
+
 	int queue_index;
 
 	pthread_mutex_t lane_lock;
+
+	pthread_mutex_t exit_lock;
+	
+	pthread_cond_t exit_condition;
 
 } Lane;
 
