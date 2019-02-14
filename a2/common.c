@@ -93,10 +93,10 @@ void lock(pthread_mutex_t* mutex) {
 	}
 }
 
-void wait(pthread_cond_t *cond, pthread_mutex_t *mutex) {
+/*void wait(pthread_cond_t *cond, pthread_mutex_t *mutex) {
 	int returnValue = pthread_cond_wait(cond, mutex);
 	if (returnValue != 0) {
 		perror("Condition wait failed."
 				"@ " __FILE__ " : " LINE_STRING "\n");	
 	}
-}
+}*/

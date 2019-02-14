@@ -9,28 +9,36 @@
 
 /* This struct will be used to lock/unlock a quadrant. */
 typedef struct _quadrant {
-
+	// Set to 0 if the quadrant is not locked, 1 otherwise.
 	int is_quad_locked;
+
+	// Mutex lock for the quadrant.
 	pthread_mutex_t quad_lock;
+
+	// Condition variable for the quadrant.
 	pthread_cond_t quad_condition;
 
 } quadrant;
 
 /* Struct containing locks for the lane and the queue of cars that have entered. */
-typedef struct _lane {
-
+typedef struct _lane{
+	// Queue of Cars who have entered the lane.
 	Car **car_queue;
 
-	Car *next_car_exit;
+	// Index of the Car whose turn it is to exit.
+	int next_car_exit;
 
+	// First index of queue which is empty.
 	int queue_index;
 
+	// Mutex lock for the lane.
 	pthread_mutex_t lane_lock;
 
+	// Mutex lock for exiting the simulation.
 	pthread_mutex_t exit_lock;
-	
-	pthread_cond_t exit_condition;
 
+	// Condition variable for exiting the simulation.
+	pthread_cond_t exit_condition;
 } Lane;
 
 /**
@@ -52,9 +60,6 @@ typedef struct _SafeStopSign {
 	StopSign base;
 
 	pthread_mutex_t intersection_lock;
-
-	// We will use this to access a quadrant in quad.
-	int quad_indexes[QUADRANT_COUNT];
 
 	// TODO: Add any members you need for synchronization here.
 	Lane lanes[DIRECTION_COUNT];
