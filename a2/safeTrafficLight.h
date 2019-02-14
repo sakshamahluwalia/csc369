@@ -7,8 +7,11 @@
 #include "car.h"
 #include "trafficLight.h"
 
+#define LIGHT_MODES 3
+
 /* Struct containing locks for the lane and the queue of cars that have entered. */
-typedef struct _lane{
+typedef struct _light_lane {
+
 	// Queue of Cars who have entered the lane.
 	Car **car_queue;
 
@@ -21,15 +24,16 @@ typedef struct _lane{
 	// Mutex lock for the lane.
 	pthread_mutex_t lane_lock;
 
-	// Mutex lock for exiting the simulation.
-	pthread_mutex_t exit_lock;
-
-	// Condition variable for entering the intersection.
-	pthread_cond_t enter_condition;
+	// Mutex lock for the lane.
+	pthread_mutex_t queue_lock;
 
 	// Condition variable for exiting the simulation.
 	pthread_cond_t exit_condition;
-} Lane;
+
+	// Mutex lock for exiting the simulation.
+	pthread_mutex_t exit_condition_lock;
+
+} LightLane;
 
 /**
 * @brief Structure that you can modify as part of your solution to implement
@@ -40,6 +44,8 @@ typedef struct _lane{
 */
 typedef struct _SafeTrafficLight {
 
+	pthread_mutex_t intersection_lock;
+
 	/**
 	* @brief The underlying light.
 	*
@@ -49,13 +55,19 @@ typedef struct _SafeTrafficLight {
 	*/
 	TrafficLight base;
 
-	pthread_mutex_t intersection_lock;
+	LightLane lanesList[TRAFFIC_LIGHT_LANE_COUNT];
 
-	int num_cars_in;
+	pthread_cond_t left_condition[DIRECTION_COUNT];
 
-	// TODO: Add any members you need for synchronization here.
-	// TODO: Add any members you need for synchronization here.
-	Lane lanes[TRAFFIC_LIGHT_LANE_COUNT];
+	pthread_mutex_t left_condition_lock[DIRECTION_COUNT];
+
+	// Condition variable for exiting the simulation.
+	pthread_cond_t light_condition[LIGHT_MODES];
+
+	// Condition variable for exiting the simulation.
+	pthread_mutex_t light_condition_lock[LIGHT_MODES];
+
+
 
 } SafeTrafficLight;
 
