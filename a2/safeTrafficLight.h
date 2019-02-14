@@ -7,6 +7,30 @@
 #include "car.h"
 #include "trafficLight.h"
 
+/* Struct containing locks for the lane and the queue of cars that have entered. */
+typedef struct _lane{
+	// Queue of Cars who have entered the lane.
+	Car **car_queue;
+
+	// Index of the Car whose turn it is to exit.
+	int next_car_exit;
+
+	// First index of queue which is empty.
+	int queue_index;
+
+	// Mutex lock for the lane.
+	pthread_mutex_t lane_lock;
+
+	// Mutex lock for exiting the simulation.
+	pthread_mutex_t exit_lock;
+
+	// Condition variable for entering the intersection.
+	pthread_cond_t enter_condition;
+
+	// Condition variable for exiting the simulation.
+	pthread_cond_t exit_condition;
+} Lane;
+
 /**
 * @brief Structure that you can modify as part of your solution to implement
 * proper synchronization for the traffic light intersection.
@@ -25,7 +49,13 @@ typedef struct _SafeTrafficLight {
 	*/
 	TrafficLight base;
 
+	pthread_mutex_t intersection_lock;
+
+	int num_cars_in;
+
 	// TODO: Add any members you need for synchronization here.
+	// TODO: Add any members you need for synchronization here.
+	Lane lanes[TRAFFIC_LIGHT_LANE_COUNT];
 
 } SafeTrafficLight;
 

@@ -114,8 +114,8 @@ void runStopSignCar(Car* car, SafeStopSign* sign) {
 	// lock(&sign->intersection_lock);
 	// Wake up other threads waiting for the quadrants and unlock the quadrants
 	for (int i = 0; i < quad_count; i++){
-		unlock(&sign->quad[quad_indexes[i]].quad_lock);
 		sign->quad[quad_indexes[i]].is_quad_locked = 0;
+		unlock(&sign->quad[quad_indexes[i]].quad_lock);
 	}
 	unlock(&sign->intersection_lock);
 

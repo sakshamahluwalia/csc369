@@ -22,7 +22,7 @@ void initTrafficLight(TrafficLight* light, int eastWest, int northSouth) {
 	}
 
 	initMutex(&light->validationLock);
-	
+
 	// Since the light transitions based on the number of cars that pass 
 	// through it, a deadlock will happen if the light expects more 
 	// east-west or more north-south cars to pass than are actually left in
