@@ -1,0 +1,587 @@
+Simulate Traffic Light: 10
+Car 0[2] entered lane
+Light: 1
+Car 0[2] has entered the traffic
+Car 0[2] moving making action 2
+Car 0[9] entered lane
+Car 0[5] entered lane
+Car 0[4] entered lane
+Light: 0
+Car 0[4] has entered the traffic
+Car 0[4] moving making action 1
+Car 0 exited lane 2
+Car 0 exited lane 4
+Light: 0
+Car 0[9] has entered the traffic
+Car 0[9] moving making action 0
+Light: 0
+Car 0[5] has entered the traffic
+Car 0[5] moving making action 2
+Car 0 exited lane 9
+Car 0[11] entered lane
+Light: 0
+Car 0[11] has entered the traffic
+Car 0[11] moving making action 2
+Car 0 exited lane 5
+Car 1[4] entered lane
+Car 1[5] entered lane
+Car 1[9] entered lane
+  First 1 threads have joined.
+Light: 0
+Car 1[4] has entered the traffic
+Car 1[4] moving making action 1
+Car 0 exited lane 11
+Car 0[3] entered lane
+Car 1[11] entered lane
+Car 1 exited lane 4
+Light: 0
+Car 1[5] has entered the traffic
+Car 1[5] moving making action 2
+Light: 0
+Car 1[9] has entered the traffic
+Car 1[9] moving making action 0
+Car 1 exited lane 5
+Light: 0
+Car 0[3] has entered the traffic
+Car 0[3] moving making action 0
+Car 1 exited lane 9
+Light: 0
+Car 1[11] has entered the traffic
+Car 1[11] moving making action 2
+Car 0 exited lane 3
+Car 1 exited lane 11
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[9] entered lane
+Light: 1
+Car 0[9] blocked making action 0
+Car 0[1] entered lane
+Light: 1
+Car 1[1] entered lane
+Car 0[1] has entered the traffic
+Car 0[1] moving making action 1
+Car 0[3] entered lane
+Light: 1
+Car 0[3] blocked making action 0
+Car 0[9] blocked making action 0
+Light: 1
+Car 1[9] entered lane
+Car 1[1] has entered the traffic
+Car 1[1] moving making action 1
+Car 1[3] entered lane
+Car 0 exited lane 1
+Car 0[10] entered lane
+Car 2[3] entered lane
+  First 1 threads have joined.
+Car 0[9] has entered the traffic
+Car 0[9] moving making action 0
+Car 1[10] entered lane
+Car 0[4] entered lane
+Car 1 exited lane 1
+Car 0 exited lane 9
+Light: 0
+Car 1[9] has entered the traffic
+Car 1[9] moving making action 0
+Car 1 exited lane 9
+Light: 0
+Car 1[3] has entered the traffic
+Car 1[3] moving making action 0
+Light: 0
+Car 0[10] has entered the traffic
+Car 0[10] moving making action 1
+Car 0[3] has entered the traffic
+Car 0[3] moving making action 0
+Car 0 exited lane 10
+Light: 0
+Car 2[3] has entered the traffic
+Car 2[3] moving making action 0
+Car 0 exited lane 3
+Car 1 exited lane 3
+Light: 0
+Car 1[10] has entered the traffic
+Car 1[10] moving making action 1
+Car 2 exited lane 3
+Car 1 exited lane 10
+Light: 0
+Car 0[4] has entered the traffic
+Car 0[4] moving making action 1
+Car 0 exited lane 4
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[6] entered lane
+Light: 1
+Car 0[6] has entered the traffic
+Car 0[6] moving making action 0
+Car 0[2] entered lane
+Car 0[7] entered lane
+Car 0[11] entered lane
+Car 1[7] entered lane
+Light: 1
+Car 1[7] has entered the traffic
+Car 1[7] moving making action 1
+Car 0[9] entered lane
+Car 0 exited lane 6
+Light: 1
+Car 0[2] has entered the traffic
+Car 0[2] moving making action 2
+Car 1[11] entered lane
+Car 0[4] entered lane
+Light: 1
+Car 0[4] blocked making action 1
+  First 1 threads have joined.
+Light: 1
+Car 0[11] blocked making action 2
+Car 0 exited lane 2
+Light: 1
+Car 0[9] blocked making action 0
+Car 0[10] entered lane
+Light: 1
+Car 0[10] blocked making action 1
+Light: 1
+Car 1[4] entered lane
+Car 0[7] has entered the traffic
+Car 0[7] moving making action 1
+Light: 0
+Car 1[11] has entered the traffic
+Car 1[11] moving making action 2
+Car 0 exited lane 7
+Car 1 exited lane 7
+Car 0[11] has entered the traffic
+Car 0[11] moving making action 2
+Car 0[9] has entered the traffic
+Car 0[9] moving making action 0
+Car 0 exited lane 11
+Car 1 exited lane 11
+Car 0[10] has entered the traffic
+Car 0[10] moving making action 1
+Car 0 exited lane 9
+Light: 0
+Car 1[4] has entered the traffic
+Car 1[4] moving making action 1
+Car 0 exited lane 10
+Car 0[4] has entered the traffic
+Car 0[4] moving making action 1
+Car 0 exited lane 4
+Car 1 exited lane 4
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[4] entered lane
+Light: 0
+Car 0[4] has entered the traffic
+Car 0[4] moving making action 1
+Car 0[9] entered lane
+Light: 0
+Car 0[9] has entered the traffic
+Car 0[10] entered lane
+Car 0 exited lane 4
+Car 0[3] entered lane
+Car 0[11] entered lane
+Car 1[4] entered lane
+Car 1[9] entered lane
+Car 0[9] moving making action 0
+  First 1 threads have joined.
+Car 0[5] entered lane
+Car 1[5] entered lane
+Car 2[5] entered lane
+Car 0 exited lane 9
+Light: 0
+Car 0[10] has entered the traffic
+Car 0[10] moving making action 1
+Car 0 exited lane 10
+Light: 0
+Car 0[3] has entered the traffic
+Car 0[3] moving making action 0
+Car 0 exited lane 3
+Light: 0
+Car 0[11] has entered the traffic
+Car 0[11] moving making action 2
+Light: 0
+Car 1[4] has entered the traffic
+Car 1[4] moving making action 1
+Car 0 exited lane 11
+Light: 0
+Car 1[9] has entered the traffic
+Car 1[9] moving making action 0
+Car 1 exited lane 4
+Car 1 exited lane 9
+Light: 0
+Car 0[5] has entered the traffic
+Car 0[5] moving making action 2
+Car 0 exited lane 5
+Light: 0
+Car 1[5] has entered the traffic
+Car 1[5] moving making action 2
+Light: 0
+Car 2[5] has entered the traffic
+Car 2[5] moving making action 2
+Car 1 exited lane 5
+Car 2 exited lane 5
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[8] entered lane
+Light: 1
+Car 0[8] has entered the traffic
+Car 0[8] moving making action 2
+Car 0[2] entered lane
+Car 0[10] entered lane
+Car 0[5] entered lane
+Car 0 exited lane 8
+Light: 1
+Car 0[2] has entered the traffic
+Car 0[2] moving making action 2
+Car 0[1] entered lane
+Car 0 exited lane 2
+Light: 1
+Car 0[10] blocked making action 1
+Car 0[9] entered lane
+Light: 1
+Car 0[9] blocked making action 0
+Car 1[8] entered lane
+Light: 1
+Car 1[8] has entered the traffic
+Car 1[8] moving making action 2
+Car 1[2] entered lane
+Car 0[11] entered lane
+  First 1 threads have joined.
+Car 1[9] entered lane
+Light: 1
+Car 1[9] blocked making action 0
+Light: 1
+Car 1 exited lane 8
+Car 0[1] has entered the traffic
+Car 0[1] moving making action 1
+Car 0[9] blocked making action 0
+Light: 1
+Car 0 exited lane 1
+Car 1[2] has entered the traffic
+Car 1[2] moving making action 2
+Light: 0
+Car 0[11] has entered the traffic
+Car 0[11] moving making action 2
+Car 1 exited lane 2
+Light: 0
+Car 0[5] has entered the traffic
+Car 0[5] moving making action 2
+Car 0 exited lane 11
+Car 0 exited lane 5
+Car 0[10] has entered the traffic
+Car 0[10] moving making action 1
+Car 0 exited lane 10
+Car 1[9] has entered the traffic
+Car 1[9] moving making action 0
+Car 0[9] has entered the traffic
+Car 0[9] moving making action 0
+Car 0 exited lane 9
+Car 1 exited lane 9
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[9] entered lane
+Light: 0
+Car 0[9] has entered the traffic
+Car 0[9] moving making action 0
+Car 0[5] entered lane
+Car 1[5] entered lane
+Car 0[4] entered lane
+Car 0 exited lane 9
+Car 0[10] entered lane
+Light: 0
+Car 0[10] has entered the traffic
+Car 0[10] moving making action 1
+Car 0 exited lane 10
+Light: 0
+Car 0[5] has entered the traffic
+Car 0[3] entered lane
+Car 2[5] entered lane
+  First 1 threads have joined.
+Car 3[5] entered lane
+Car 4[5] entered lane
+Car 0[5] moving making action 2
+Light: 0
+Car 1[5] has entered the traffic
+Car 1[5] moving making action 2
+Car 0 exited lane 5
+Light: 0
+Car 0[4] has entered the traffic
+Car 0[4] moving making action 1
+Car 1 exited lane 5
+Car 5[5] entered lane
+Light: 0
+Car 5[5] has entered the traffic
+Car 5[5] moving making action 2
+Car 0 exited lane 4
+Light: 0
+Car 2[5] has entered the traffic
+Car 2[5] moving making action 2
+Light: 0
+Car 3[5] has entered the traffic
+Car 3[5] moving making action 2
+Car 2 exited lane 5
+Car 3 exited lane 5
+Light: 0
+Car 4[5] has entered the traffic
+Car 4[5] moving making action 2
+Car 4 exited lane 5
+Light: 0
+Car 0[3] has entered the traffic
+Car 0[3] moving making action 0
+Car 5 exited lane 5
+Car 0 exited lane 3
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[4] entered lane
+Light: 1
+Car 0[4] blocked making action 1
+Car 0[7] entered lane
+Light: 1
+Car 0[8] entered lane
+Car 1[8] entered lane
+Car 0[7] has entered the traffic
+Car 0[7] moving making action 1
+Car 0[2] entered lane
+Car 0[4] blocked making action 1
+Car 0 exited lane 7
+Light: 1
+Car 0[8] has entered the traffic
+Car 0[0] entered lane
+Car 0[8] moving making action 2
+Car 1[7] entered lane
+Car 2[7] entered lane
+Car 2[8] entered lane
+Light: 1
+Car 1[8] has entered the traffic
+Car 0 exited lane 8
+Car 3[8] entered lane
+Car 1[8] moving making action 2
+Car 1 exited lane 8
+Light: 1
+Car 0[2] has entered the traffic
+Car 0[2] moving making action 2
+Car 0[4] blocked making action 1
+Light: 1
+Car 0[0] has entered the traffic
+Car 0[0] moving making action 0
+Car 0 exited lane 2
+Light: 1
+Car 1[7] has entered the traffic
+Car 1[7] moving making action 1
+Car 0 exited lane 0
+Light: 1
+Car 2[7] has entered the traffic
+Car 2[7] moving making action 1
+Car 1 exited lane 7
+Car 2 exited lane 7
+Light: 1
+Car 2[8] has entered the traffic
+Car 2[8] moving making action 2
+Light: 1
+Car 3[8] has entered the traffic
+Car 3[8] moving making action 2
+Car 2 exited lane 8
+Car 0[4] has entered the traffic
+Car 0[4] moving making action 1
+Car 3 exited lane 8
+Car 0 exited lane 4
+  First 1 threads have joined.
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[7] entered lane
+Light: 1
+Car 0[7] has entered the traffic
+Car 0[7] moving making action 1
+Car 0[6] entered lane
+Car 0[8] entered lane
+Car 0[9] entered lane
+Car 0 exited lane 7
+Light: 1
+Car 0[6] has entered the traffic
+Car 0[6] moving making action 0
+Car 1[9] entered lane
+Light: 1
+Car 0[8] has entered the traffic
+Car 0[8] moving making action 2
+Car 0 exited lane 6
+Car 0[0] entered lane
+Light: 1
+Car 0[0] has entered the traffic
+Car 0[0] moving making action 0
+Car 0[2] entered lane
+Car 0 exited lane 8
+Light: 1
+Car 1[9] blocked making action 0
+Light: 1
+Car 0[9] blocked making action 0
+Car 0 exited lane 0
+  First 1 threads have joined.
+Light: 1
+Car 0[2] has entered the traffic
+Car 0[2] moving making action 2
+Car 0[1] entered lane
+Car 1[0] entered lane
+Car 2[0] entered lane
+Car 0[9] blocked making action 0
+Car 0 exited lane 2
+Car 1[9] blocked making action 0
+Light: 1
+Car 0[1] has entered the traffic
+Car 0[1] moving making action 1
+Light: 1
+Car 1[0] has entered the traffic
+Car 1[0] moving making action 0
+Car 0 exited lane 1
+Light: 1
+Car 2[0] has entered the traffic
+Car 2[0] moving making action 0
+Car 1 exited lane 0
+Car 2 exited lane 0
+Car 1[9] has entered the traffic
+Car 1[9] moving making action 0
+Car 0[9] has entered the traffic
+Car 0[9] moving making action 0
+Car 0 exited lane 9
+Car 1 exited lane 9
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[8] entered lane
+Light: 1
+Car 0[8] has entered the traffic
+Car 0[8] moving making action 2
+Car 0[1] entered lane
+Car 0[4] entered lane
+Car 0[5] entered lane
+Light: 1
+Car 0[5] blocked making action 2
+Light: 1
+Car 1[4] entered lane
+Car 2[4] entered lane
+Car 0[10] entered lane
+Car 0[1] has entered the traffic
+Car 0[1] moving making action 1
+Car 0 exited lane 8
+Car 0[9] entered lane
+Light: 0
+Car 0[9] has entered the traffic
+Car 0[9] moving making action 0
+Car 0 exited lane 1
+Car 0 exited lane 9
+Car 0[11] entered lane
+Light: 0
+Car 0[11] has entered the traffic
+Car 0[11] moving making action 2
+Car 1[9] entered lane
+  First 1 threads have joined.
+Light: 0
+Car 2[4] has entered the traffic
+Car 2[4] moving making action 1
+Car 0 exited lane 11
+Light: 0
+Car 0[10] has entered the traffic
+Car 0[10] moving making action 1
+Car 0[5] has entered the traffic
+Car 0[5] moving making action 2
+Car 0 exited lane 10
+Car 0 exited lane 5
+Light: 0
+Car 0[4] has entered the traffic
+Car 0[4] moving making action 1
+Car 0 exited lane 4
+Light: 0
+Car 1[4] has entered the traffic
+Car 1[4] moving making action 1
+Car 1 exited lane 4
+Light: 0
+Car 1[9] has entered the traffic
+Car 1[9] moving making action 0
+Car 2 exited lane 4
+Car 1 exited lane 9
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulate Traffic Light: 10
+Car 0[7] entered lane
+Light: 1
+Car 0[7] has entered the traffic
+Car 0[7] moving making action 1
+Car 0[10] entered lane
+Car 0[6] entered lane
+Car 0[3] entered lane
+Light: 1
+Car 0[3] blocked making action 0
+Light: 1
+Car 0[10] blocked making action 1
+Car 0 exited lane 7
+Light: 1
+Car 0[4] entered lane
+Car 0[6] has entered the traffic
+Car 0[6] moving making action 0
+Car 1[7] entered lane
+Light: 1
+Car 1[7] has entered the traffic
+Car 1[7] moving making action 1
+Car 0[0] entered lane
+Car 0 exited lane 6
+Car 1[4] entered lane
+  First 1 threads have joined.
+Car 0[5] entered lane
+Light: 1
+Car 0[5] blocked making action 2
+Car 1 exited lane 7
+Car 1[3] entered lane
+Light: 1
+Car 1[3] blocked making action 0
+Light: 1
+Car 0[4] blocked making action 1
+Car 0[3] blocked making action 0
+Car 0[10] blocked making action 1
+Light: 1
+Car 0[0] has entered the traffic
+Car 0[0] moving making action 0
+Light: 0
+Car 1[4] has entered the traffic
+Car 1[4] moving making action 1
+Car 0 exited lane 0
+Car 1[3] has entered the traffic
+Car 1[3] moving making action 0
+Car 0[4] has entered the traffic
+Car 0[4] moving making action 1
+Car 0 exited lane 4
+Car 0[3] has entered the traffic
+Car 0[3] moving making action 0
+Car 1 exited lane 4
+Car 0[10] has entered the traffic
+Car 0[10] moving making action 1
+Car 0 exited lane 3
+Car 1 exited lane 3
+Car 0 exited lane 10
+Car 0[5] has entered the traffic
+Car 0[5] moving making action 2
+Car 0 exited lane 5
+  All threads joined
+Checking token sets:
+Checking tokens for each car:
+
+Simulation complete!

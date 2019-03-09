@@ -25,9 +25,6 @@ typedef struct _lightlane{
 	pthread_mutex_t exit_lock;
 
 	// Condition variable for entering the intersection.
-	pthread_cond_t go_condition;
-
-	// Condition variable for entering the intersection.
 	pthread_cond_t left_condition;
 
 	// Condition variable for exiting the simulation.

@@ -32,7 +32,7 @@ void initSafeTrafficLight(SafeTrafficLight* light, int horizontal, int vertical)
 			light->lanes[i].car_queue = malloc(sizeof(Car *) * vertical);
 		}
 		initConditionVariable(&light->lanes[i].left_condition);
-		initConditionVariable(&light->lanes[i].go_condition);
+		// initConditionVariable(&light->lanes[i].go_condition);
 		initConditionVariable(&light->lanes[i].exit_condition);
 	}
 
@@ -54,8 +54,13 @@ void destroySafeTrafficLight(SafeTrafficLight* light) {
 		destroyMutex(&light->lanes[i].lane_lock);
 		destroyMutex(&light->lanes[i].exit_lock);
 		destroyConditionVariable(&light->lanes[i].left_condition);
-		destroyConditionVariable(&light->lanes[i].go_condition);
+		// destroyConditionVariable(&light->lanes[i].go_condition);
 		destroyConditionVariable(&light->lanes[i].exit_condition);
+		// for (int car_index = 0; car_index < light->lanes[i].queue_index; ++car_index)
+		// {
+		// 	free(light->lanes[i].car_queue[car_index]);
+		// }
+		// printf("%d\n", light->lanes[i].queue_index);
 		free(light->lanes[i].car_queue);
 	}
 	for (int i = 0; i < 2; ++i)
