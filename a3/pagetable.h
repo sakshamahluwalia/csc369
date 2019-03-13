@@ -7,7 +7,7 @@
 
 #define TRACE_64
 
-#define PAGE_SHIFT      12     // number of bits 2^(PAGE_SHIFT) == PAGE_SIZE
+#define PAGE_SHIFT      12   // number of bits 2^(PAGE_SHIFT) == PAGE_SIZE
 #define PAGE_SIZE       4096 // Size of pagetable pages
 #define PAGE_MASK       (~(PAGE_SIZE-1))
 #define PG_VALID        (0x1) // Valid bit in pgd or pte, set if in memory
@@ -47,13 +47,13 @@ typedef unsigned long addr_t;
 
 // Page directory entry (top-level)
 typedef struct { 
-	uintptr_t pde; 
+	uintptr_t pde;
 } pgdir_entry_t;
 
 // Page table entry (2nd-level). 
 typedef struct { 
 	unsigned int frame; // if valid bit == 1, physical frame holding vpage
-	off_t swap_off;       // offset in swap file of vpage, if any
+	off_t swap_off;     // offset in swap file of vpage, if any
 } pgtbl_entry_t;    
 
 extern void init_pagetable();
