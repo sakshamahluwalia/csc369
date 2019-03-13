@@ -53,9 +53,6 @@ int allocate_frame(pgtbl_entry_t *p) {
 				evict_dirty_count++;
 				pte->swap_off = offset;
 				pte->frame &= ~PG_DIRTY;
-
-				// TODO: should we update swap if its dirty or both?!
-				pte->frame |= PG_ONSWAP;
 			}
 
 		// if page not dirty
@@ -65,8 +62,13 @@ int allocate_frame(pgtbl_entry_t *p) {
 			evict_clean_count++;
 		}
 
+		// p->frame &= ~PG_REF; // double check
+
 		// set pte valid bit to not valid
 		pte->frame &= ~PG_VALID;
+
+		// update the swap bit to indicate the page has been swapped out
+		pte->frame |= PG_ONSWAP;
 
 	}
 
@@ -176,7 +178,7 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
 	if (p->frame & PG_VALID) { // p is valid
-		
+
 		hit_count++;
 
 	} else { // p is not valid
@@ -185,33 +187,35 @@ char *find_physpage(addr_t vaddr, char type) {
 
 		if (p->frame & PG_ONSWAP) { // p has been swapped out
 
-			// already has been initialised
-
+			// has been initialised
 			// swap in
-			// update swap bit to indicate its in phy mem
-			// update dirty bit to 0 since its as fresh as it can be
-
 			if (swap_pagein(frame, p->swap_off) != 0) {
 				exit(1);
 			}
 
 			p->frame = frame << PAGE_SHIFT;
-			p->frame |= ~PG_ONSWAP;
+
+			// update swap bit to indicate its in phy mem
 
 		} else {
 
 			// has not been initialised
-
 			// init frame
-			// update dirty bit to as stated above
 			init_frame(frame, vaddr);
+
+			p->swap_off = swap_pageout(frame, p->swap_off);
 			p->frame = frame << PAGE_SHIFT;
+
+			// p->frame |= PG_DIRTY;
 		}
 
-		p->frame &= PG_DIRTY;
-		miss_count++;
-	}
+		// update dirty bit to 0 since its as fresh as it can be
 
+		p->frame &= ~PG_ONSWAP;
+		miss_count++;
+
+		coremap[p->frame >> PAGE_SHIFT].new_page = 1;
+	}
 
 	// Make sure that p is marked valid and referenced. Also mark it
 	// dirty if the access type indicates that the page will be written to.
