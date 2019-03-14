@@ -20,8 +20,11 @@ int myIndex;
  */
 int fifo_evict() {
 
+	// use linked list evict head
+
+
 	int min = myIndex;
-	int pos = -1;
+	int pos = 0;
 
 	for (int i = 0; i < memsize; i++) {
 
@@ -40,13 +43,14 @@ int fifo_evict() {
  */
 void fifo_ref(pgtbl_entry_t *p) {
 
+	// add to the tail by keeping and updating a reference to it.
+
 	if (coremap[p->frame >> PAGE_SHIFT].new_page) {
 		
 		coremap[p->frame >> PAGE_SHIFT].new_page = 0;
-		coremap[p->frame >> PAGE_SHIFT].entry = myIndex;
+		coremap[p->frame >> PAGE_SHIFT].entry = myIndex++;
 
 	}
-	myIndex++;
 	return;
 }
 
