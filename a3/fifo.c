@@ -21,20 +21,14 @@ int myIndex;
 int fifo_evict() {
 
 	// use linked list evict head
-
-
-	int min = myIndex;
-	int pos = 0;
-
-	for (int i = 0; i < memsize; i++) {
-
-		if (min > coremap[i].entry) {
-			min = coremap[i].entry;
-			pos = i;
-		}
+	int evict_count = myIndex;
+	myIndex++;
+	if (myIndex == memsize)
+	{
+		myIndex = 0;
 	}
 
-	return pos;
+	return evict_count;
 }
 
 /* This function is called on each access to a page to update any information
@@ -42,15 +36,8 @@ int fifo_evict() {
  * Input: The page table entry for the page that is being accessed.
  */
 void fifo_ref(pgtbl_entry_t *p) {
-
+	
 	// add to the tail by keeping and updating a reference to it.
-
-	if (coremap[p->frame >> PAGE_SHIFT].new_page) {
-		
-		coremap[p->frame >> PAGE_SHIFT].new_page = 0;
-		coremap[p->frame >> PAGE_SHIFT].entry = myIndex++;
-
-	}
 	return;
 }
 
@@ -58,12 +45,6 @@ void fifo_ref(pgtbl_entry_t *p) {
  * replacement algorithm 
  */
 void fifo_init() {
-
-	for (int i = 0; i < memsize; i++)
-	{
-		coremap[i].new_page = 0;
-		coremap[i].entry = 0;
-	}
 
 	myIndex = 0;
 

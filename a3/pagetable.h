@@ -61,12 +61,21 @@ extern char *find_physpage(addr_t vaddr, char type);
 
 extern void print_pagedirectory(void);
 
+typedef struct node {
+
+	int val;
+	struct node* left;
+	struct node* right;
+
+} node_t;
+
 struct frame {
 	char in_use;       // True if frame is allocated, False if frame is free
 	pgtbl_entry_t *pte;// Pointer back to pagetable entry (pte) for page
 	                   // stored in this frame
 	int new_page;
-	int entry;
+	node_t* page_node;
+
 };
 
 /* The coremap holds information about physical memory.

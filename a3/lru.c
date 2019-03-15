@@ -12,18 +12,9 @@ extern int debug;
 
 extern struct frame *coremap;
 
-typedef struct node {
-    int val;
-    struct node* right;
-    struct node* left;
-} node_t;
-
-node_t* head;
 int size;
-
-
-
-
+node_t* head;
+node_t* tail;
 
 /* Page to evict is chosen using the accurate LRU algorithm.
  * Returns the page frame number (which is also the index in the coremap)
@@ -31,14 +22,11 @@ int size;
  */
 
 int lru_evict() {
-	
-	// pop head make head.next = head
-	int frame = head->val;
+	int frame;
+	frame = head->val;
 	head = head->right;
-	if (head->left != NULL)
-	{
-		head->left = NULL;
-	}
+	printf("DEBUG\n");
+	size--;
 	return frame;
 }
 
@@ -48,74 +36,58 @@ int lru_evict() {
  */
 void lru_ref(pgtbl_entry_t *p) {
 
-	// update linked list
-	if (coremap[p->frame >> PAGE_SHIFT].new_page) {
-
-		node_t* node = malloc(sizeof(node_t));
+	if (coremap[p->frame >> PAGE_SHIFT].new_page) { // miss page not in mem
 		
-		// miss (not in linked list)
-		if (size == 0) {
+		coremap[p->frame >> PAGE_SHIFT].page_node->val = p->frame >> PAGE_SHIFT;
 
-			node->val = p->frame >> PAGE_SHIFT;
-			node->right = NULL;
-			node->left = NULL;
+		if (size == 0)  { // no entries in linked list
 
-			head = node;
+			coremap[p->frame >> PAGE_SHIFT].page_node->left = NULL;
+			coremap[p->frame >> PAGE_SHIFT].page_node->right = NULL;
 
-		} else {
+			head = coremap[p->frame >> PAGE_SHIFT].page_node;
+			tail = head;
 
-			// linked list has items in it.
-			// walk the list and find tail.
-			node_t* tail = head;
-			while (tail->right != NULL) {
-				tail = tail->right;
-			}
+		} else { // 1 or more entries
 
-			assert(tail->right == NULL);
-			// node is the tail
+			coremap[p->frame >> PAGE_SHIFT].page_node->left = tail;
+			coremap[p->frame >> PAGE_SHIFT].page_node->right = NULL;
+			tail->right = coremap[p->frame >> PAGE_SHIFT].page_node;
+			tail = coremap[p->frame >> PAGE_SHIFT].page_node;
 
-			// create a new node
-			node->val = p->frame >> PAGE_SHIFT;
-			node->right = NULL;
-
-			// make node the tail and update the old tail pointer
-			node->left = tail;
-			tail->right = node;
 		}
+
 		size++;
+		coremap[p->frame >> PAGE_SHIFT].new_page = 0;
 
-	} else {
+	} else { // hit page in mem
 
-		// hit (already somewhere in the linked list)
-		// find it
-		node_t* curr = head;
-		while (curr->right != NULL) {
+		if (coremap[p->frame >> PAGE_SHIFT].page_node != tail) {
+			
+			if (coremap[p->frame >> PAGE_SHIFT].page_node == head) {
 
-			if (curr->val == p->frame >> PAGE_SHIFT) {
-				break;
+				head = head->right;
+				head->left = NULL;
+				tail->right = coremap[p->frame >> PAGE_SHIFT].page_node;
+				coremap[p->frame >> PAGE_SHIFT].page_node->left = tail;
+				coremap[p->frame >> PAGE_SHIFT].page_node->right = NULL;
+				tail = coremap[p->frame >> PAGE_SHIFT].page_node;
+
+			} else {
+
+				coremap[p->frame >> PAGE_SHIFT].page_node->left->right = coremap[p->frame >> PAGE_SHIFT].page_node->right;
+				coremap[p->frame >> PAGE_SHIFT].page_node->right->left = coremap[p->frame >> PAGE_SHIFT].page_node->left;
+				tail->right = coremap[p->frame >> PAGE_SHIFT].page_node;
+				coremap[p->frame >> PAGE_SHIFT].page_node->left = tail;
+				coremap[p->frame >> PAGE_SHIFT].page_node->right = NULL;
+				tail = coremap[p->frame >> PAGE_SHIFT].page_node;
+
 			}
 
-			curr = curr->right;
 		}
 
-		// disconnect curr node
-		curr->left->right = curr->right;
-		curr->right->left = curr->left;
-
-		// curr is the node containing the page frame.
-		assert(curr->val == p->frame >> PAGE_SHIFT);
-
-		// move this node to the end.
-		node_t* node = head;
-		while (node->right != NULL) {
-			node = node->right;
-		}
-
-		// update the [pointers]
-		node->right = curr;
-		curr->left = node;
-		curr->right = NULL;
 	}
+
 }
 
 
@@ -124,10 +96,22 @@ void lru_ref(pgtbl_entry_t *p) {
  */
 void lru_init() {
 
-	// initialise linked list with head and tail
+
 	head = malloc(sizeof(node_t));
 	head->left = malloc(sizeof(node_t));
 	head->right = malloc(sizeof(node_t));
-	head->left = NULL;
+
+	tail = malloc(sizeof(node_t));
+	tail->left = malloc(sizeof(node_t));
+	tail->right = malloc(sizeof(node_t));
+
+	for (int i = 0; i < memsize; ++i)
+	{
+		coremap[i].page_node = malloc(sizeof(node_t));
+		coremap[i].page_node->left = malloc(sizeof(node_t));
+		coremap[i].page_node->right = malloc(sizeof(node_t));
+	}
+
 	size = 0;
+
 }
