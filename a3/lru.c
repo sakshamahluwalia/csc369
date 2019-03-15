@@ -25,7 +25,6 @@ int lru_evict() {
 	int frame;
 	frame = head->val;
 	head = head->right;
-	printf("DEBUG\n");
 	size--;
 	return frame;
 }

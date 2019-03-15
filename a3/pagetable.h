@@ -75,6 +75,7 @@ struct frame {
 	                   // stored in this frame
 	int new_page;
 	node_t* page_node;
+	int clock_reference;
 
 };
 
